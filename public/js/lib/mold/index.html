@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+	
+	
+	
+	<script src="simplehtmlparser.js"></script>
+	<script src="mold.js"></script>
+	<script>
+		
+	var template = '<div style="background: {{primaryColor}};" class="tag {{cow}} {{name}} moo">First: <span class="tagchild">{{name}}</span> and Last: <span class="tagchild">{{lname}}</span>.</div> <div class="tag2">zzz</div> <div class="tag3">zzz</div>'
+
+
+	var mold = new Mold(template)
+	var doms = mold.create()
+
+	for (var i = 0; i < doms.length; i++) {
+		document.body.appendChild(doms[i])
+	}
+
+	console.log("created", doms)
+
+	setInterval(function () {
+		mold.update({
+			name: Math.random(),
+			lname: "Mid",
+			cow: "bbqqqqq"
+		})
+	}, 50)
+
+	var color1 = "red", color2 = "green"
+	var currentColor = "green"
+	setInterval(function () {
+		mold.update({
+			primaryColor: currentColor = (currentColor === color1 ? color2 : color1)
+		})
+	}, 4000)
+
+	</script>
+
+</body>
+</html>

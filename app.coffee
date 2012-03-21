@@ -1,14 +1,18 @@
 
+
+
 PORT = process.env.PORT || 2663
 
 express = require 'express'
+connectLess = require 'connect-less'
 
 exports.createServer = ->
 
     app = express.createServer()
     app.use express.bodyParser()
-
-    app.get "/", (req, res) -> res.send "HI"
+    app.use connectLess({ src: __dirname + '/public' })
+    app.use express.static(__dirname + "/public")
+    
 
     app
 

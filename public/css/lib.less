@@ -1,0 +1,167 @@
+
+// i.TV global LESS utilities, avoid putting app-specific code in here (there is some already)
+
+// z-index constants
+@z-modal: 200;
+@z-fixed: 100;
+@z-cover-3: 75;
+@z-cover-2: 50;
+@z-cover-1: 25; 
+@z-standard: 0;
+
+.border-radius (@radius: 5px) {
+    -moz-border-radius: @radius;
+    -webkit-border-radius: @radius;
+    -ms-border-radius: @radius;
+    -o-border-radius: @radius;
+    border-radius: @radius;
+}
+
+.border-bottom-left-radius (@radius: 5px) {
+    -moz-border-bottom-left-radius: @radius;
+    -webkit-border-bottom-left-radius: @radius;
+    -ms-border-bottom-left-radius: @radius;
+    -o-border-bottom-left-radius: @radius;
+    border-bottom-left-radius: @radius;
+}
+
+.border-top-left-radius (@radius: 5px) {
+    -moz-border-top-left-radius: @radius;
+    -webkit-border-top-left-radius: @radius;
+    -ms-border-top-left-radius: @radius;
+    -o-border-top-left-radius: @radius;
+    border-top-left-radius: @radius;
+}
+
+// you really only should set this to border-box to be compatible (content-box is default except for buttons)
+.box-sizing (@type: content-box) {
+    -moz-box-sizing: @type;
+    -webkit-box-sizing: @type;
+    -ms-box-sizing: @type;
+    -o-box-sizing: @type;
+    box-sizing: @type;
+}
+
+.background-size (@arg: nothing, @arg: nothing) {
+    @sizes: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-background-size: @sizes;
+    -moz-background-size: @sizes;
+    -o-background-size: @sizes;
+    background-size: @sizes;
+}
+
+// had to do the nothing hack bacause it was treating spaces as argument delimiters if it had 1 argument, WTF!?
+.box-shadow (@arg: nothing, @arg: nothing) {
+    @shadows: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-box-shadow: @shadows;
+    -moz-box-shadow: @shadows;
+    -ms-box-shadow: @shadows;
+    -o-box-shadow: @shadows;
+    box-shadow: @shadows;
+}
+
+.background-clip (@arg: nothing, @arg: nothing) {
+    @clips: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-background-clip: @clips;
+    -moz-background-clip: @clips;
+    -ms-background-clip: @clips;
+    -o-background-clip: @clips;
+    background-clip: @clips;
+}
+
+.transition (@arg: nothing, @arg: nothing) {
+    @transitions: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-transition: @transitions;
+    -moz-transition: @transitions;
+    -ms-transition: @transitions;
+    -o-transition: @transitions;
+    transition: @transitions;
+}
+
+// adds a transition for transform only, send it your time and easing method
+.transition-transform (@arg: nothing, @arg: nothing) {
+    @transitions: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-transition: -webkit-transform @transitions;
+    -moz-transition: -moz-transform @transitions;
+    -ms-transition: -ms-transform @transitions;
+    -o-transition: -o-transform @transitions;
+    transition: transform @transitions;
+}
+
+.transform (@arg: nothing, @arg: nothing) {
+    @transforms: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-transform: @transforms;
+    -moz-transform: @transforms;
+    -ms-transform: @transforms;
+    -o-transform: @transforms;
+    transform: @transforms;
+}
+
+.transform-origin (@arg: nothing, @arg: nothing) {
+    @transform-origins: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    -webkit-transform-origin: @transform-origins;
+    -moz-transform-origin: @transform-origins;
+    -ms-transform-origin: @transform-origins;
+    -o-transform-origin: @transform-origins;
+    transform-origin: @transform-origins;
+}
+
+// if you want to use this be sure to set background: to a boring color to fall back to
+.gradient (@arg: nothing, @arg: nothing) {
+    @gradients: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    background: -moz-linear-gradient(@gradients);
+    background: -webkit-linear-gradient(@gradients);
+    background: -o-linear-gradient(@gradients);
+    background: -ms-linear-gradient(@gradients);
+    background: linear-gradient(@gradients);
+}
+
+.modalBlocker (@opacity: 0.6) {
+    background: rgba(0, 0, 0, @opacity);
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: @z-modal - 4;
+}
+
+.radialGradient (@arg: nothing, @arg: nothing) {
+    @gradients: ~`"@{arguments}".replace(/^\[|\,\ nothing\]|\]$/g, "")`;
+    background: -moz-radial-gradient(@gradients);
+    background: -webkit-radial-gradient(@gradients);
+    background: -o-radial-gradient(@gradients);
+    background: -ms-radial-gradient(@gradients);
+    background: radial-gradient(@gradients);
+}
+
+.modalBlocker (@opacity: 0.6) {
+    background: rgba(0, 0, 0, @opacity);
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: @z-modal - 4;
+}
+
+
+// this stuff belongs in a pusle sheet
+
+// Variables -  dont go too crazy with these
+@candyapple-green: #B8C82A;
+@bluemoon-blue: #2CB5E8;
+@winter-green: #6aba6c;
+@cherry-red: #D94848;
+@brushed-metal: #4c4c4c;
+@postboxsize: 65px;
+
+// we use thie like 5 places
+.headerBgGradient () {
+    .gradient(top, #FAFAFA 0px, #F5F5F5 3px, #EDEDED 33px, #E4E4E4 33px, #E2E2E2 40px, #DCDCDC 100%);
+}
+
+.earthGreenGradient () {
+    background: #6cbc5f;
+    .gradient(top, #6cbc5f 0%, #64b457 48%, #5aac4b 93%, #5aab4c 100%);
+}
