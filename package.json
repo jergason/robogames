@@ -20,7 +20,8 @@
         "underscore": "1.1.5",
         "coffee-script":"1.2.0",
         "fjs": "0.1.0",
-        "connect-less": "0.2.4"
+        "connect-less": "0.2.4",
+        "mongodb-wrapper":"0.2.7"
     },
 
     "devDependencies": {
