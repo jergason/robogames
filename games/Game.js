@@ -4,7 +4,7 @@ Game
 */
 
 (function() {
-  var Game;
+  var Game, Player;
 
   Game = (function() {
 
@@ -14,6 +14,7 @@ Game
       this.level = level;
       this.player = player;
       this.states = states;
+      this.state = states[states.length - 1];
     }
 
     Game.prototype.valid = function() {
@@ -25,9 +26,24 @@ Game
   })();
 
   Game.convert = function(doc) {
-    return new Game(doc.gameId, doc.name, doc.level, doc.turn, doc.player, doc.states);
+    if (!(doc != null)) return null;
+    return new Game(doc.gameId, doc.name, doc.level, doc.player, doc.states);
   };
 
-  module.expores = Game;
+  Player = (function() {
+
+    function Player(username, email, link) {
+      this.username = username.replace(/[^\w]/g, "");
+      this.email = email;
+      this.link = link;
+    }
+
+    return Player;
+
+  })();
+
+  Game.Player = Player;
+
+  module.exports = Game;
 
 }).call(this);

@@ -20,8 +20,8 @@ move = (start, action) ->
     switch action
         when "right" then point start.x + 1, start.y
         when "left" then point start.x - 1, start.y
-        when "up" then point start.x, start.y + 1
-        when "down" then point start.x, start.y - 1
+        when "up" then point start.x, start.y - 1
+        when "down" then point start.x, start.y + 1
         else false
 
 withinBounds = (size, p) -> (0 <= p.x < size.w) && (0 <= p.y < size.h)
@@ -48,17 +48,17 @@ exports.one =
         target: point 9, 9
         mines: [] 
 
-    move: (state, move) ->
+    move: (state, m) ->
         # make the move
-        state.player = move state.player, move.action
+        state.player = move state.player, m.action
 
         if not withinBounds state.size, state.player
-            return {error: "invalid move"}
+            return false
 
         if collision state.mines, state.player
             state.mode = modes.dead
 
-        else if won state.starget, state.player
+        else if won state.target, state.player
             state.mode = modes.won
 
         state
