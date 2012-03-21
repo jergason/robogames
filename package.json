@@ -1,0 +1,30 @@
+{
+    "author": "Sean Hess <sean@i.tv>",
+    "name": "robogames",
+    "description": "robogames",
+    "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/idottv/robogames.git"
+    },
+    "scripts": {
+        "test": "node_modules/.bin/coffee -c . && node_modules/.bin/mocha test/*.spec.js"
+    },
+    "engines": {
+        "node": "0.6.x"
+    },
+    "dependencies": { 
+        "request":"2.9.153",
+        "express":"2.5.8",
+        "async": "0.1.15",
+        "underscore": "1.1.5",
+        "coffee-script":"1.2.0",
+        "fjs": "0.1.0"
+    },
+
+    "devDependencies": {
+        "mocha":"0.12.1"
+    },
+
+    "optionalDependencies": {}
+}
