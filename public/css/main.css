@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.gameBoard {
+  background: yellow;
+  height: 75%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 75%;
+}
+.cell {
+  position: absolute;
+  -webkit-transition: all 1s linear;
+  -moz-transition: all 1s linear;
+  -ms-transition: all 1s linear;
+  -o-transition: all 1s linear;
+  transition: all 1s linear;
+}
+.cell img {
+  display: block;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
