@@ -1,0 +1,5 @@
+#!/bin/bash
+
+node_modules/.bin/coffee -c app.coffee
+node_modules/.bin/coffee -c games
+node_modules/.bin/coffee -c test

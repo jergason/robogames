@@ -6,23 +6,23 @@ The front-end for the different games. Handles storage and retreival of game sta
 */
 
 (function() {
-  var Game, Games, fjs, uniqueId;
+  var Game, Model, fjs, uniqueId;
 
   fjs = require('fjs').attachPrototype();
 
   Game = require('./Game');
 
-  Games = (function() {
+  Model = (function() {
 
-    function Games(collection) {
+    function Model(collection) {
       this.play = exports.play.partial(collection);
     }
 
-    return Games;
+    return Model;
 
   })();
 
-  module.exports = Games;
+  exports.Model = Model;
 
   exports.play = function(games, game, levelName, player, cb) {
     var gameId, level, state;

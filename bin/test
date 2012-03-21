@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# move to root directory
+cd $(dirname $0)
+cd ..
+
+# don't forget to compile
+bin/compile
+
+node_modules/.bin/mocha test/*.js

@@ -8,7 +8,7 @@
         "url": "git://github.com/idottv/robogames.git"
     },
     "scripts": {
-        "test": "node_modules/.bin/coffee -c . && node_modules/.bin/mocha test/*.spec.js"
+        "test": "bin/test"
     },
     "engines": {
         "node": "0.6.x"

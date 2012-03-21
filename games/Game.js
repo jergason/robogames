@@ -28,6 +28,6 @@ Game
     return new Game(doc.gameId, doc.name, doc.level, doc.turn, doc.player, doc.states);
   };
 
-  module.expores = Game;
+  module.exports = Game;
 
 }).call(this);

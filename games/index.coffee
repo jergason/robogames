@@ -8,13 +8,12 @@ The front-end for the different games. Handles storage and retreival of game sta
 fjs = require('fjs').attachPrototype()
 Game = require './Game'
 
-class Games
+class Model
     constructor: (collection) ->
         @play = exports.play.partial collection
 
 
-module.exports = Games
-
+exports.Model = Model
 
 # start the game
 # needs: gameId and starting state
