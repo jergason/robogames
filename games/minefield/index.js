@@ -37,9 +37,9 @@ Synchronous: all level moves return synchronously.
       case "left":
         return point(start.x - 1, start.y);
       case "up":
-        return point(start.x, start.y + 1);
-      case "down":
         return point(start.x, start.y - 1);
+      case "down":
+        return point(start.x, start.y + 1);
       default:
         return false;
     }
@@ -75,16 +75,12 @@ Synchronous: all level moves return synchronously.
         mines: []
       };
     },
-    move: function(state, move) {
-      state.player = move(state.player, move.action);
-      if (!withinBounds(state.size, state.player)) {
-        return {
-          error: "invalid move"
-        };
-      }
+    move: function(state, m) {
+      state.player = move(state.player, m.action);
+      if (!withinBounds(state.size, state.player)) return false;
       if (collision(state.mines, state.player)) {
         state.mode = modes.dead;
-      } else if (won(state.starget, state.player)) {
+      } else if (won(state.target, state.player)) {
         state.mode = modes.won;
       }
       return state;

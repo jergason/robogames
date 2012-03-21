@@ -11,6 +11,8 @@ Game = require './Game'
 class Model
     constructor: (collection) ->
         @play = exports.play.partial collection
+        @move = exports.move.partial collection
+        @index = exports.index.partial collection
 
 
 exports.Model = Model
@@ -23,37 +25,45 @@ exports.play = (games, game, levelName, player, cb) ->
     state = level.start()
 
     # store the game and return it to the player
-    exports.storeGame games, new Game(gameId, game.name, levelName, 0, player, state), cb
+    storeGame games, new Game(gameId, game.name, levelName, player, [state]), cb
 
 
 
 # make a move
 # needs: new state
-exports.move = (turns, game, gameId, move, cb) ->
-    exports.lastTurn turns, gameId, (err, turn) ->
+exports.move = (games, game, gameId, move, cb) ->
+    exports.lastState games, gameId, (err, g) ->
         if err? then return cb err
-        level = game[turn.level]
-        state = level.move turn.state, move
+        level = game[g.level]
+        state = level.move g.state, move
 
-        exports.addState games, gameId, state, cb  
+        if not state
+            return cb new Error "Invalid Move"
 
+        updateState games, gameId, state, cb  
 
+# build indexes
+exports.index = (games, cb) ->
+    games.ensureIndex({gameId: 1}, cb)
 
 
 # gets the last game state (not opinionated about the format!)
 exports.lastState = (games, gameId, cb) ->
-    games.find({gameId: gameId}, {_id: 0, states:{$slice:-1}}).one (err, doc) ->
+    games.find({gameId: gameId}, {_id: 0, level: 1, states:{$slice:-1}}).one (err, doc) ->
         if err? then return cb err
+        if not doc? then return cb new Error("Could not find game")
         cb null, Game.convert(doc)
 
-exports.addState = (games, gameId, state, cb) ->
-    games.update {gameId: gameId}, {$push: {states: state}}, (err) ->
+
+
+updateState = (games, gameId, state, cb) ->
+    games.update {gameId: gameId}, {state: state, $push: {states: state}}, (err) ->
         if err? then return cb err
         cb null, state
 
 # store an existing game state
 # gameId, turn, state, player (player info?)
-exports.storeGame = (games, game, cb) ->
+storeGame = (games, game, cb) ->
 
     if not game.valid() then return cb(new Error("Invalid Game"))
 
@@ -61,9 +71,7 @@ exports.storeGame = (games, game, cb) ->
         if err? then return cb err
         cb null, Game.convert(doc)
 
-# build indexes
-exports.index = (games, cb) ->
-    states.ensureIndex({gameId: 1}, cb)
+
 
 
 
