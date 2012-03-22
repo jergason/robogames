@@ -62,16 +62,42 @@ describe 'games', ->
                 assert.equal state.player.x, 1
                 done()
 
+        it 'should move down (and remember state)', (done) ->
+            games.move minefield, gameId, {action: "down"}, (err, state) ->
+                assert.ifError err
+                assert.ok state
+                assert.ok state.player
+                assert.equal state.player.x, 1
+                assert.equal state.player.y, 1
+                done()
+
         it 'should fail if I move off screen', (done) ->
-            games.move minefield, gameId, {action: "up"}, (err, state) ->
-                assert.ok err, 'should have given me an error that I cant move up'
+            games.move minefield, gameId, {action: "down"}, (err, state) ->
+                assert.ok err, 'should have given me an error that I cant move down'
+                done()
+
+        it 'should win if I move onto the target', (done) ->
+            # we're at 1, 1 from before
+            games.move minefield, gameId, {action: "left"}, (err, state) ->
+                assert.ifError err
+                assert.equal state.mode, minefield.modes.won
+                done()
+
+
+        game3Id = null
+
+        it 'should work with level 3', (done) ->
+            games.play minefield, "three", player, (err, game) ->
+                game3Id = game.gameId
                 done()
 
         it 'should die if I move onto a mine', (done) ->
-            assert.ok false, "test me"
+            games.move minefield, game3Id, {action: "down"}, (err, state) ->
+                assert.ifError err
+                assert.ok state
+                assert.equal state.mode, minefield.modes.dead
+                done()
 
-        it 'should win if I move onto the target', (done) ->
-            assert.ok false, "test me"
 
 
 

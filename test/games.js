@@ -43,7 +43,7 @@
       });
     });
     return describe('minefield', function() {
-      var gameId;
+      var game3Id, gameId;
       gameId = null;
       it('should let me connect', function(done) {
         return games.play(minefield, "one", player, function(err, game) {
@@ -70,19 +70,51 @@
           return done();
         });
       });
-      it('should fail if I move off screen', function(done) {
+      it('should move down (and remember state)', function(done) {
         return games.move(minefield, gameId, {
-          action: "up"
+          action: "down"
         }, function(err, state) {
-          assert.ok(err, 'should have given me an error that I cant move up');
+          assert.ifError(err);
+          assert.ok(state);
+          assert.ok(state.player);
+          assert.equal(state.player.x, 1);
+          assert.equal(state.player.y, 1);
           return done();
         });
       });
-      it('should die if I move onto a mine', function(done) {
-        return assert.ok(false, "test me");
+      it('should fail if I move off screen', function(done) {
+        return games.move(minefield, gameId, {
+          action: "down"
+        }, function(err, state) {
+          assert.ok(err, 'should have given me an error that I cant move down');
+          return done();
+        });
       });
-      return it('should win if I move onto the target', function(done) {
-        return assert.ok(false, "test me");
+      it('should win if I move onto the target', function(done) {
+        return games.move(minefield, gameId, {
+          action: "left"
+        }, function(err, state) {
+          assert.ifError(err);
+          assert.equal(state.mode, minefield.modes.won);
+          return done();
+        });
+      });
+      game3Id = null;
+      it('should work with level 3', function(done) {
+        return games.play(minefield, "three", player, function(err, game) {
+          game3Id = game.gameId;
+          return done();
+        });
+      });
+      return it('should die if I move onto a mine', function(done) {
+        return games.move(minefield, game3Id, {
+          action: "down"
+        }, function(err, state) {
+          assert.ifError(err);
+          assert.ok(state);
+          assert.equal(state.mode, minefield.modes.dead);
+          return done();
+        });
       });
     });
   });

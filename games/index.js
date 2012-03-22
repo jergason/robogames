@@ -52,15 +52,13 @@ The front-end for the different games. Handles storage and retreival of game sta
   };
 
   exports.lastState = function(games, gameId, cb) {
-    return games.find({
+    return games.findOne({
       gameId: gameId
     }, {
       _id: 0,
       level: 1,
-      states: {
-        $slice: -1
-      }
-    }).one(function(err, doc) {
+      state: 1
+    }, function(err, doc) {
       if (err != null) return cb(err);
       if (!(doc != null)) return cb(new Error("Could not find game"));
       return cb(null, Game.convert(doc));
@@ -71,11 +69,13 @@ The front-end for the different games. Handles storage and retreival of game sta
     return games.update({
       gameId: gameId
     }, {
-      state: state,
+      $set: {
+        state: state
+      },
       $push: {
         states: state
       }
-    }, function(err) {
+    }, false, false, function(err) {
       if (err != null) return cb(err);
       return cb(null, state);
     });

@@ -3,13 +3,13 @@ Game
 ###
 
 class Game
-    constructor: (gameId, name, level, player, states) ->
+    constructor: (gameId, name, level, player, states, state) ->
         @gameId = gameId
         @name = name
         @level = level
         @player = player
         @states = states # an array of State objects. These are specific to the type of game
-        @state = states[states.length - 1] # the last (current) state
+        @state = state || states[states.length - 1] # the last (current) state
 
     valid: -> true
 
@@ -17,7 +17,7 @@ class Game
 # converts raw documents into a game object
 Game.convert = (doc) -> 
     if not doc? then return null
-    new Game doc.gameId, doc.name, doc.level, doc.player, doc.states
+    new Game doc.gameId, doc.name, doc.level, doc.player, doc.states, doc.state
 
 class Player
     constructor: (username, email, link) ->

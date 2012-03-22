@@ -49,7 +49,7 @@ exports.index = (games, cb) ->
 
 # gets the last game state (not opinionated about the format!)
 exports.lastState = (games, gameId, cb) ->
-    games.find({gameId: gameId}, {_id: 0, level: 1, states:{$slice:-1}}).one (err, doc) ->
+    games.findOne {gameId: gameId}, {_id: 0, level: 1, state: 1}, (err, doc) ->
         if err? then return cb err
         if not doc? then return cb new Error("Could not find game")
         cb null, Game.convert(doc)
@@ -57,7 +57,7 @@ exports.lastState = (games, gameId, cb) ->
 
 
 updateState = (games, gameId, state, cb) ->
-    games.update {gameId: gameId}, {state: state, $push: {states: state}}, (err) ->
+    games.update {gameId: gameId}, {$set: {state: state}, $push: {states: state}}, false, false, (err) ->
         if err? then return cb err
         cb null, state
 
