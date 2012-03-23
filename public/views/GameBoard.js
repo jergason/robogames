@@ -51,9 +51,11 @@ function (_
         addEntity: function (type, entityModel) {
             var entity = new CellView(entityModel, type)
             this.$el.append(entity.$el)
+
             entity.setScale(this.scale)
 
             this.entitiesById[entityModel.id] = entity
+            this.cells.push(entity)
         },
 
         generateCells: function () {
@@ -93,6 +95,7 @@ function (_
         calculateScale: function () {
             var width = this.$el.width()
             var height = this.$el.height()
+
             this.scale = Math.floor(width / this.model.width)
         },
 
