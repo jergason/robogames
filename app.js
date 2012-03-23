@@ -29,20 +29,25 @@
       var level, player;
       level = req.param("level");
       player = req.body;
-      return games.play(minefield, level, player, function(err, state) {
+      return games.play(minefield, level, player, function(err, game) {
         if (err != null) return res.send(err, 500);
-        return res.send(state);
+        return res.send(game);
       });
     });
     app.post("/minefield/:gameId/moves", function(req, res) {
-      var gameId, player;
+      var gameId, move;
       gameId = req.param("gameId");
-      return player = req.body;
+      move = req.body;
+      return games.move(minefield(gameId, move, function(err, state) {
+        if (err != null) return res.send(err, 500);
+        return res.send(state);
+      }));
     });
-    app.get("/minefield/levels", notImplemented);
+    app.get("/minefield/levels", function(req, res) {
+      return res.send(minefield.levels());
+    });
     app.get("/minefield/levels/:level/games", notImplemented);
-    app.get("/minefield/:gameId/turns", notImplemented);
-    app.get("/minefield/:gameId/turns/latest", notImplemented);
+    app.get("/minefield/:gameId", notImplemented);
     app.get("/players/:username/games", notImplemented);
     return app;
   };

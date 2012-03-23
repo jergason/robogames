@@ -33,44 +33,46 @@ exports.createServer = ->
 
     # PLAY THE GAME #######################################################
 
+
+    # Minefield
+    # State {mode: "play|dead|won", size: {w, h}, player: {x, y}, target: {x, y}, mines: [{x, y, id}]}
+
     # Create a game
     # If you retry a level with the same player, it will erase the old game
-    # body: Player {username, email, repo}
-    # ret: State {gameId, positions, etc}
+    # body: Player {username, email, link}
+    # ret: Game {gameId, state: State, states: [State]} (see above)
     app.post "/minefield/levels/:level/games", (req, res) ->
         level = req.param "level"
         player = req.body
-        games.play minefield, level, player, (err, state) ->
+        games.play minefield, level, player, (err, game) ->
             if err? then return res.send err, 500
-            res.send state
+            res.send game
 
 
 
-    # makes a move
+    # makes a move, and returns the new game state
     # body: Move {action: "right|left|down|up"} 
-    # ret: State {gameId, turn :: Int, positions :: [??]} 
+    # ret: State (see above)
     app.post "/minefield/:gameId/moves", (req, res) ->
         gameId = req.param "gameId"
-        player = req.body
-
+        move = req.body
+        games.move minefield gameId, move, (err, state) ->
+            if err? then return res.send err, 500
+            res.send state
 
 
 
     # ADMIN / VIEWER ######################################################
 
     # ret: ["levelId"]
-    app.get "/minefield/levels", notImplemented
+    app.get "/minefield/levels", (req, res) ->
+        res.send minefield.levels()
 
     # ret: ["gameId"]
     app.get "/minefield/levels/:level/games", notImplemented
 
-    # returns all the states for the game
-    # ret: [State]
-    app.get "/minefield/:gameId/turns", notImplemented
-
-    # returns the latest state for the game
-    # ret: State
-    app.get "/minefield/:gameId/turns/latest", notImplemented
+    # returns a game, with latest state and all states
+    app.get "/minefield/:gameId", notImplemented
 
     # ret: ["gameId"]
     app.get "/players/:username/games", notImplemented
