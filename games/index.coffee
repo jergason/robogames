@@ -69,7 +69,7 @@ storeGame = (games, game, cb) ->
 
     games.save game, (err, doc) ->
         if err? then return cb err
-        cb null, Game.convert(doc)
+        cb null, game.summary()
 
 
 

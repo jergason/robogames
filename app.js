@@ -1,5 +1,5 @@
 (function() {
-  var MONGODB_HOST, PORT, app, connectLess, express, games, minefield, mongo, notImplemented;
+  var Games, MONGODB_HOST, PORT, app, connectLess, express, minefield, mongo, notImplemented;
 
   PORT = process.env.PORT || 2663;
 
@@ -11,12 +11,12 @@
 
   mongo = require('mongodb-wrapper');
 
-  games = require('./games');
+  Games = require('./games').Model;
 
   minefield = require('./games/minefield');
 
   exports.createServer = function() {
-    var app, db;
+    var app, db, games;
     app = express.createServer();
     app.use(express.bodyParser());
     app.use(connectLess({
@@ -24,7 +24,8 @@
     }));
     app.use(express.static(__dirname + "/public"));
     db = mongo.db(MONGODB_HOST, 27017, "robogames");
-    db.collection('states');
+    db.collection('games');
+    games = new Games(db.games);
     app.post("/minefield/levels/:level/games", function(req, res) {
       var level, player;
       level = req.param("level");

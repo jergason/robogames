@@ -46,11 +46,7 @@ describe 'games', ->
                 assert.ifError err
                 assert.ok game
                 assert.ok game.gameId
-                assert.ok game.player
-                assert.equal game.player.username, "test"
-                assert.equal game.player.username, player.username
-                assert.ok game.states
-                assert.ok game.states[0], "missing initial state"
+                assert.ok game.state
                 gameId = game.gameId
                 done()
 

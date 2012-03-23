@@ -9,10 +9,11 @@ connectLess = require 'connect-less'
 mongo = require 'mongodb-wrapper'
 
 # games
-games = require './games'
+Games = require('./games').Model
 minefield = require './games/minefield'
 
 exports.createServer = ->
+
 
     app = express.createServer()
     app.use express.bodyParser()
@@ -22,7 +23,12 @@ exports.createServer = ->
 
     # mongo connection
     db = mongo.db MONGODB_HOST, 27017, "robogames"
-    db.collection 'states'
+    db.collection 'games'
+
+    # games
+    games = new Games(db.games)
+
+
 
 
     # BROWSER #############################################################
@@ -40,7 +46,7 @@ exports.createServer = ->
     # Create a game
     # If you retry a level with the same player, it will erase the old game
     # body: Player {username, email, link}
-    # ret: Game {gameId, state: State, states: [State]} (see above)
+    # ret: {gameId, state: State} (see above)
     app.post "/minefield/levels/:level/games", (req, res) ->
         level = req.param "level"
         player = req.body

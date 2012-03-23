@@ -85,7 +85,7 @@ The front-end for the different games. Handles storage and retreival of game sta
     if (!game.valid()) return cb(new Error("Invalid Game"));
     return games.save(game, function(err, doc) {
       if (err != null) return cb(err);
-      return cb(null, Game.convert(doc));
+      return cb(null, game.summary());
     });
   };
 

@@ -15,10 +15,20 @@ Game
       this.player = player;
       this.states = states;
       this.state = state || states[states.length - 1];
+      if ((player != null) && (name != null) && (level != null)) {
+        this._id = name + "_" + level + "_" + player.username;
+      }
     }
 
     Game.prototype.valid = function() {
       return true;
+    };
+
+    Game.prototype.summary = function() {
+      return {
+        gameId: this.gameId,
+        state: this.state
+      };
     };
 
     return Game;
