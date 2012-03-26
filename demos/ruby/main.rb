@@ -2,7 +2,6 @@ HOST = 'http://dev.i.tv:2663' # Set this to the address of the game server
 
 require "rubygems"
 require "bundler/setup"
-require "httparty"
 require "./robo_game"
 
 

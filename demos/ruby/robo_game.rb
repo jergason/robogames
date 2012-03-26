@@ -1,3 +1,5 @@
+require "httparty"
+
 class RoboGame
   attr_accessor :username, :email, :repo
   attr_reader :level, :game_id, :game_state
