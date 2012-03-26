@@ -72,7 +72,7 @@ function (_
 
         play: function () {
             if (this.interval) return
-            this.interval = setInterval(_.bind(this.tick, this), 2000)
+            this.interval = setInterval(_.bind(this.tick, this), 500)
         },
 
         stop: function () {
