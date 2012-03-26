@@ -39,7 +39,7 @@ exports.createServer = ->
         player = req.body
         if not player.username then return res.send "Need a username!", 500
         games.play minefield, level, player, (err, game) ->
-            if err? then return res.send err, 500
+            if err? then return res.send err.message, 500
             res.send game
     # makes a move, and returns the new game state
     # body: Move {action: "right|left|down|up"} 
@@ -62,7 +62,7 @@ exports.createServer = ->
     # ret: ["gameId"]
     app.get "/minefield/games", (req, res) ->
         games.getGames (err, docs) ->
-            if err? then return res.send err, 500
+            if err? then return res.send err.message, 500
             if not docs then return res.send "No games found", 404
             res.send docs
 
@@ -70,7 +70,7 @@ exports.createServer = ->
     app.get "/minefield/games/:gameId", (req, res) ->
         gameId = req.params.gameId
         games.getGameById gameId, (err, doc) ->
-            if err? then return res.send err, 500
+            if err? then return res.send err.message, 500
             if not doc then return res.send "Game not found", 404
             res.send doc
 
