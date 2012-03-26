@@ -19,7 +19,7 @@ POST to /minefield/levels/:level/games
 where :level is one,two,...
 
 and post body is:
-```javascript
+```js
 { username: "username, //required
   email: "youremail@email.com" // optional
   link: "github.com/name/yourcode" //optional
@@ -28,7 +28,7 @@ and post body is:
 encoded as JSON or form-encoded
 
 it returns a JSON object:
-```javascript
+```js
 { gameId: 'exampleId', // a random Id
   state: StateObj // (see state below)
 }
@@ -43,7 +43,7 @@ POST to /minefield/:gameId/moves
 where :gameId is the id received from the start post
 
 and post body is (JSON or form encoded):
-```javascript
+```js
 { action: "direction" //valid directions are "up" "down" "left" "right"
 }
 ```
@@ -57,7 +57,7 @@ Game State
 For each gameId, the server keeps track of the current game state and all prior states
 
 On starting a game and on each subsequent move, the new game state is returned which is as below:
-```javascript
+```js
 { mode: 'play', // valid modes are "play", "dead", and "won"
   size: { w: 2, h: 2 }, // the size of the board
   player: { x: 0, y: 0 }, // the players current positon
