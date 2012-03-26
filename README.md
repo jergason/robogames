@@ -32,8 +32,7 @@ it returns a JSON object:
   state: StateObj // (see state below)
 }
 
-#NOTE: Only one game per level per player at a time, i.e, creating a new game on level 1 will delete 
-your previous attempt
+##NOTE: Only one game per level per player at a time, i.e, creating a new game on level 1 will delete your previous attempt
 
 To move
 --------
