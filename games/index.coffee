@@ -13,7 +13,8 @@ class Model
         @play = exports.play.partial collection
         @move = exports.move.partial collection
         @index = exports.index.partial collection
-        @gamesByLevel = exports.gamesByLevel.partial collection
+        @getGames = exports.getGames.partial collection
+        @getGameById = exports.getGameById.partial collection
 
 
 exports.Model = Model
@@ -36,7 +37,6 @@ exports.move = (games, game, gameId, move, cb) ->
     exports.lastState games, gameId, (err, g) ->
         if err? then return cb err
         level = game[g.level]
-        console.log level
         state = level.move g.state, move
 
         if not state
@@ -74,16 +74,21 @@ storeGame = (games, game, cb) ->
         cb null, game.summary()
 
 
-exports.gamesByLevel = (games, levelNum, cb) ->
-    games.find {level: levelNum}.toArray (err, docs) ->
+exports.getGames = (games, cb) ->
+    games.find({}).toArray (err, docs) ->
         if err? then return cb err
-        console.log docs
+        if not docs then return cb(new Error("no games find"))
 
         gameObjs = []
         for doc in docs
-            gameObjs.push new Game(doc)
+            gameObjs.push Game.convert doc
 
         cb null, gameObjs
+
+exports.getGameById = (games, gameId, cb) ->
+    games.findOne {gameId: gameId}, (err, doc) ->
+        if err? then return cb err
+        cb doc
 
 uniqueId = -> Math.random().toString(36).replace("0.", "")
 

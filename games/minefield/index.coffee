@@ -19,7 +19,6 @@ point = (x, y) -> {x, y}
 size = (w, h) -> {w, h}
 
 movePoint = (start, action) ->
-    console.log start, action
     switch action
         when "right" then point start.x + 1, start.y
         when "left" then point start.x - 1, start.y

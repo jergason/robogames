@@ -62,17 +62,19 @@ exports.createServer = ->
         res.send minefield.levels()
 
     # ret: ["gameId"]
-    app.get "/minefield/levels/:level/games", (req, res) ->
-        level = req.params.level
-        games.gamesByLevel level, (err, docs) ->
+    app.get "/minefield/games", (req, res) ->
+        games.getGames (err, docs) ->
             if err? then return res.send err, 500
+            if not docs then return res.send "No games found", 404
             res.send docs
 
     # returns a game, with latest state and all states
-    app.get "/minefield/:gameId", notImplemented
-
-    # ret: ["gameId"]
-    app.get "/players/:username/games", notImplemented
+    app.get "/minefield/:gameId", (req, res) ->
+        gameId = req.params.gameId
+        games.getGameById gameId, (err, doc) ->
+            if err? then return res.send err, 500
+            if not doc then return res.send "Game not found", 404
+            res.send doc
 
     app
 
