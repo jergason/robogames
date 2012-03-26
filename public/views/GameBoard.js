@@ -64,10 +64,10 @@ function (_
         },
 
         calculateScale: function () {
-            var width = this.$el.width()
             var height = this.$el.height()
 
-            this.scale = Math.floor(width / this.model.state.size.w)
+            this.scale = Math.floor(height / this.model.state.size.h)
+            this.$el.width(this.scale * this.model.state.size.w + 1)
         },
 
         play: function () {
