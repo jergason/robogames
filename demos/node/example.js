@@ -10,7 +10,7 @@ if (process.argv.length !== 4) {
     process.exit(1)
 }
 
-var host = "http://localhost:2663"
+var host = "http://dev.i.tv:2663"
 var userName = process.argv[2]
 var level = process.argv[3]
 
@@ -28,9 +28,10 @@ function makeMove(gameId, action, cb) {
 }
 
 // kick off the game by registering a new game
-var startBody = {username:  userName}
+var startBody = {username:  userName, email: "youremail@email.com"}
 var reqObj = {url: host + "/minefield/levels/" + level + "/games", json: startBody}
 request.post(reqObj,function(err, res, body) {
+    console.log(body)
     if (err || res.statusCode !== 200) return console.log("died!", err)
 
     var jsonRes = body

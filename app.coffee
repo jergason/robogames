@@ -1,6 +1,3 @@
-
-
-
 PORT = process.env.PORT || 2663
 MONGODB_HOST = process.env.MONGODB_HOST || "localhost"
 
@@ -40,6 +37,7 @@ exports.createServer = ->
     app.post "/minefield/levels/:level/games", (req, res) ->
         level = req.param "level"
         player = req.body
+        if not player.username then return res.send "Need a username!", 500
         games.play minefield, level, player, (err, game) ->
             if err? then return res.send err, 500
             res.send game
@@ -69,7 +67,7 @@ exports.createServer = ->
             res.send docs
 
     # returns a game, with latest state and all states
-    app.get "/minefield/:gameId", (req, res) ->
+    app.get "/minefield/games/:gameId", (req, res) ->
         gameId = req.params.gameId
         games.getGameById gameId, (err, doc) ->
             if err? then return res.send err, 500
@@ -77,10 +75,6 @@ exports.createServer = ->
             res.send doc
 
     app
-
-
-notImplemented = (req, res) ->
-    res.send "Not Implemented", 501
 
 
 if module == require.main

@@ -24,6 +24,7 @@ exports.Model = Model
 exports.play = (games, game, levelName, player, cb) ->
     gameId = uniqueId()
     level = game[levelName]
+    if not level then return cb(new Error("Invalid Level"))
     state = level.start()
 
     # store the game and return it to the player
