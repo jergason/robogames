@@ -13,8 +13,6 @@ Games = require('./games').Model
 minefield = require './games/minefield'
 
 exports.createServer = ->
-
-
     app = express.createServer()
     app.use express.bodyParser()
     app.use connectLess({ src: __dirname + '/public' })
@@ -28,15 +26,7 @@ exports.createServer = ->
     # games
     games = new Games(db.games)
 
-
-
-
     # BROWSER #############################################################
-
-
-
-
-
     # PLAY THE GAME #######################################################
 
 
@@ -53,17 +43,14 @@ exports.createServer = ->
         games.play minefield, level, player, (err, game) ->
             if err? then return res.send err, 500
             res.send game
-
-
-
     # makes a move, and returns the new game state
     # body: Move {action: "right|left|down|up"} 
     # ret: State (see above)
     app.post "/minefield/:gameId/moves", (req, res) ->
-        gameId = req.param "gameId"
+        gameId = req.params.gameId
         move = req.body
-        games.move minefield gameId, move, (err, state) ->
-            if err? then return res.send err, 500
+        games.move minefield, gameId, move, (err, state) ->
+            if err? then return res.send err.message, 500
             res.send state
 
 
@@ -75,14 +62,17 @@ exports.createServer = ->
         res.send minefield.levels()
 
     # ret: ["gameId"]
-    app.get "/minefield/levels/:level/games", notImplemented
+    app.get "/minefield/levels/:level/games", (req, res) ->
+        level = req.params.level
+        games.gamesByLevel level, (err, docs) ->
+            if err? then return res.send err, 500
+            res.send docs
 
     # returns a game, with latest state and all states
     app.get "/minefield/:gameId", notImplemented
 
     # ret: ["gameId"]
     app.get "/players/:username/games", notImplemented
-
 
     app
 

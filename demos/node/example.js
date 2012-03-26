@@ -10,35 +10,36 @@ if (process.argv.length !== 4) {
     process.exit(1)
 }
 
-var host = "http://dev.i.tv:3000"
-var userName = process.argv[1]
-var level = process.argv[2]
+var host = "http://localhost:2663"
+var userName = process.argv[2]
+var level = process.argv[3]
 
 // this function makes a move given a gameId and returns the new game state
 function makeMove(gameId, action, cb) {
-    var moveBody = "action=" + action
-    var moveObj = {url: host + "/minefield/" + gameId + "/moves", body: moveBody}
+    var moveBody = { action: action }
+    var moveObj = {url: host + "/minefield/" + gameId + "/moves", json: moveBody}
 
     request.post(moveObj, function(err, res, body) {
+        console.log(body)
         if (err || res.statusCode !== 200) return console.log("oops!", err)
 
-        cb(JSON.parse(body))
+        cb(body)
     })
 }
 
 // kick off the game by registering a new game
-var startBody = "username=" + userName
-var reqObj = {url: host + "/minefield/levels/" + level, body: startBody}
+var startBody = {username:  userName}
+var reqObj = {url: host + "/minefield/levels/" + level + "/games", json: startBody}
 request.post(reqObj,function(err, res, body) {
     if (err || res.statusCode !== 200) return console.log("died!", err)
 
-    var jsonRes = JSON.parse(body)
+    var jsonRes = body
     var gameState = jsonRes.mode
     var gameId = jsonRes.gameId
 
     var positon = jsonRes.position
 
-    makeMove(gameId, "up", function(gameState) {
+    makeMove(gameId, "down", function(gameState) {
         console.log('you have made your first move!', gameState)
         return
     })
