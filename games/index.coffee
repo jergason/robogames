@@ -13,9 +13,15 @@ class Model
         @play = exports.play.partial collection
         @move = exports.move.partial collection
         @index = exports.index.partial collection
+        @fetch = exports.fetch.partial collection
 
 
 exports.Model = Model
+
+
+# just dumps out the game from the db
+exports.fetch = (games, gameId, cb) -> games.findOne({gameId:gameId}, cb)
+
 
 # start the game
 # needs: gameId and starting state

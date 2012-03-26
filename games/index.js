@@ -18,6 +18,7 @@ The front-end for the different games. Handles storage and retreival of game sta
       this.play = exports.play.partial(collection);
       this.move = exports.move.partial(collection);
       this.index = exports.index.partial(collection);
+      this.fetch = exports.fetch.partial(collection);
     }
 
     return Model;
@@ -25,6 +26,12 @@ The front-end for the different games. Handles storage and retreival of game sta
   })();
 
   exports.Model = Model;
+
+  exports.fetch = function(games, gameId, cb) {
+    return games.findOne({
+      gameId: gameId
+    }, cb);
+  };
 
   exports.play = function(games, game, levelName, player, cb) {
     var gameId, level, state;

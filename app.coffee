@@ -62,7 +62,7 @@ exports.createServer = ->
     app.post "/minefield/:gameId/moves", (req, res) ->
         gameId = req.param "gameId"
         move = req.body
-        games.move minefield gameId, move, (err, state) ->
+        games.move minefield, gameId, move, (err, state) ->
             if err? then return res.send err, 500
             res.send state
 
@@ -78,7 +78,20 @@ exports.createServer = ->
     app.get "/minefield/levels/:level/games", notImplemented
 
     # returns a game, with latest state and all states
-    app.get "/minefield/:gameId", notImplemented
+    # ret: Game {gameId, level, name, player: Player, state: State, states: [State]}
+    app.get "/games/:gameId", (req, res) ->
+        games.fetch req.param('gameId'), (err, game) ->
+            if err? then return res.send err, 500
+            if !game then return res.send 404
+            res.send game
+
+    # returns only the latest state for a game
+    # ret: State
+    app.get "/games/:gameId/state", (req, res) ->
+        games.fetch req.param('gameId'), (err, game) ->
+            if err? then return res.send err, 500
+            if !game then return res.send 404
+            res.send game.state
 
     # ret: ["gameId"]
     app.get "/players/:username/games", notImplemented

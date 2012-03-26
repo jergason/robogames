@@ -80,10 +80,10 @@ Synchronous: all level moves return synchronously.
   exports.name = "minefield";
 
   exports.levels = function() {
-    return ["one", "two"];
+    return ["tiny", "empty", "easy", "lotsOfMines"];
   };
 
-  exports.one = {
+  exports.one = exports.tiny = {
     start: function() {
       var state;
       return state = {
@@ -95,11 +95,12 @@ Synchronous: all level moves return synchronously.
       };
     },
     move: function(state, m) {
-      return moveState(state, m.action);
+      var newState;
+      return newState = moveState(state, m.action);
     }
   };
 
-  exports.two = {
+  exports.two = exports.empty = {
     start: function() {
       var state;
       return state = {
@@ -115,7 +116,7 @@ Synchronous: all level moves return synchronously.
     }
   };
 
-  exports.three = {
+  exports.three = exports.easy = {
     start: function() {
       var mine, state;
       mine = mines();
@@ -125,6 +126,23 @@ Synchronous: all level moves return synchronously.
         player: point(0, 0),
         target: point(9, 9),
         mines: [mine(8, 0), mine(0, 1)]
+      };
+    },
+    move: function(state, m) {
+      return moveState(state, m.action);
+    }
+  };
+
+  exports.lotsOfMines = {
+    start: function() {
+      var mine, state;
+      mine = mines();
+      return state = {
+        mode: modes.play,
+        size: size(10, 10),
+        player: point(0, 0),
+        target: point(9, 9),
+        mines: [mine(0, 5), mine(0, 9), mine(1, 7), mine(3, 2), mine(3, 6), mine(4, 8), mine(5, 7), mine(6, 0), mine(6, 6), mine(7, 0), mine(7, 1), mine(7, 8), mine(8, 0), mine(8, 2), mine(8, 4), mine(8, 9), mine(9, 2), mine(9, 5)]
       };
     },
     move: function(state, m) {

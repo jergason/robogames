@@ -58,12 +58,12 @@ moveState = (currentState, action) ->
 
 exports.name = "minefield"
 
-exports.levels = -> ["one", "two"]
+exports.levels = -> ["tiny", "empty", "easy", "lotsOfMines"]
 
 # Level one just allows you to move
 
 # only have to move one space!
-exports.one = 
+exports.one = exports.tiny = 
     start: -> state =
         mode: modes.play
         size: size 2, 2 
@@ -72,10 +72,10 @@ exports.one =
         mines: [] 
 
     move: (state, m) -> 
-        moveState state, m.action
+        newState = moveState state, m.action
 
 # move across the board
-exports.two = 
+exports.two = exports.empty =
     start: -> state =
         mode: modes.play
         size: size 10, 10 
@@ -87,7 +87,7 @@ exports.two =
         moveState state, m.action
 
 # some mines
-exports.three = 
+exports.three = exports.easy =  
     start: -> 
         mine = mines()
         state =
@@ -101,6 +101,39 @@ exports.three =
 
     move: (state, m) -> 
         moveState state, m.action
+
+# these mines were randomly generated
+exports.lotsOfMines = 
+    start: -> 
+        mine = mines()
+        state =
+            mode: modes.play
+            size: size 10, 10 
+            player: point 0, 0
+            target: point 9, 9
+            mines: [ mine(0, 5)
+                   , mine(0, 9)
+                   , mine(1, 7)
+                   , mine(3, 2)
+                   , mine(3, 6)
+                   , mine(4, 8)
+                   , mine(5, 7)
+                   , mine(6, 0)
+                   , mine(6, 6)
+                   , mine(7, 0)
+                   , mine(7, 1)
+                   , mine(7, 8)
+                   , mine(8, 0)
+                   , mine(8, 2)
+                   , mine(8, 4)
+                   , mine(8, 9)
+                   , mine(9, 2)
+                   , mine(9, 5)
+                   ]
+
+    move: (state, m) -> 
+        moveState state, m.action
+
 
 
 
