@@ -1,12 +1,19 @@
 .cell {
+    background: no-repeat center center;
+    background-size: auto 90%;
     position: absolute;
 
     .transition(all 1s linear);
 
-    img {
-        display: block;
-        margin: auto;
-        max-height: 100%;
-        max-width: 100%;
+    &.mine {
+        background-image: url("/img/mine.png");
+    }
+
+    &.finish {
+        background-image: url("/img/finish_flag.png");
+    }
+
+    &.player {
+      background-image: url("/img/blue_robot.png");
     }
 }

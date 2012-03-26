@@ -5,13 +5,15 @@ define( [ "views/View"
 function (View
         , template
         ) {
-function c(){var f=Math.floor;var r=Math.random;return "rgb(a,a,a)".replace("a",f(r()*255)).replace("a",f(r()*255)).replace("a",f(r()*255))}
+
     return View.extend({
         template: template,
 
         initialize: function (model, type) {
             this.model = model
             this.type = type
+
+            this.$el.addClass(type)
 
 
 

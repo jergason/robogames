@@ -16,73 +16,9 @@ require.config({
     }
 })
 
-require(["jquery", "modernizr", "backbone", "views/GameBoard"],
-    function ($, modernizr, Backbone, GameBoard) {
-        var game = new GameBoard({
-            width: 40,
-            height: 30,
-            turns: [
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 2},
-                        {id: "c", x: 3, y: 2},
-                        {id: "d", x: 4, y: 2},
-                        {id: "e", x: 5, y: 2},
-                    ]
-                },
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 3},
-                        {id: "c", x: 3, y: 2},
-                        {id: "d", x: 4, y: 2},
-                        {id: "e", x: 5, y: 2},
-                    ]
-                },
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 2},
-                        {id: "c", x: 3, y: 3},
-                        {id: "d", x: 4, y: 2},
-                        {id: "e", x: 5, y: 2},
-                    ]
-                },
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 3},
-                        {id: "c", x: 3, y: 3},
-                        {id: "d", x: 4, y: 3},
-                        {id: "e", x: 5, y: 2},
-                    ]
-                },
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 3},
-                        {id: "c", x: 3, y: 3},
-                        {id: "d", x: 4, y: 3},
-                        {id: "e", x: 5, y: 3},
-                    ]
-                },
-                {
-                    mines: [
-                        {id: "a", x: 1, y: 3},
-                        {id: "b", x: 2, y: 3},
-                        {id: "c", x: 3, y: 3},
-                        {id: "d", x: 4, y: 3},
-                        {id: "e", x: 5, y: 4},
-                    ]
-                },
-            ]
-        })
-
-        $("#mainContent").append(game.$el)
-
-        game.resize()
-        game.play()
-
+require(["jquery", "modernizr", "backbone", "views/GameViewer"],
+    function ($, modernizr, Backbone, GameViewer) {
+        new GameViewer($("#mainContent"))
+        Backbone.history.start()
     }
 )

@@ -89,7 +89,7 @@ exports.getGames = (games, cb) ->
 exports.getGameById = (games, gameId, cb) ->
     games.findOne {gameId: gameId}, (err, doc) ->
         if err? then return cb err
-        cb doc
+        cb null, doc
 
 uniqueId = -> Math.random().toString(36).replace("0.", "")
 
