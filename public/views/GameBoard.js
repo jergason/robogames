@@ -1,13 +1,13 @@
 define( [ "underscore"
         , "views/View"
         , "text!views/GameBoard.html"
-        , "views/Cell"
+        , "views/Entity"
         ],
        
 function (_
         , View
         , template
-        , CellView
+        , EntityView
         ) {
 
     return View.extend({
@@ -41,25 +41,25 @@ function (_
         },
 
         addEntity: function (type, entityModel) {
-            var entity = new CellView(entityModel, type)
+            var entity = new EntityView(entityModel, type)
             this.$el.append(entity.$el)
 
             entity.setScale(this.scale)
 
             this.entitiesById[entityModel.id] = entity
-            this.cells.push(entity)
+            this.entities.push(entity)
         },
 
-        updateCellScales: function () {
-            for (var i = 0; i < this.cells.length; i++) {
-                this.cells[i].setScale(this.scale)
+        updateEntityScales: function () {
+            for (var i = 0; i < this.entities.length; i++) {
+                this.entities[i].setScale(this.scale)
             }
         },
 
         resize: function () {
             if (!this.model) return
             this.calculateScale()
-            this.updateCellScales()
+            this.updateEntityScales()
             this.render()
         },
 
@@ -105,13 +105,13 @@ function (_
         reset: function () {
             this.stop()
 
-            if (this.cells) {
-                for (var i = 0; i < this.cells.length; i++) {
-                    this.cells[i].destroy()
+            if (this.entities) {
+                for (var i = 0; i < this.entities.length; i++) {
+                    this.entities[i].destroy()
                 }
             }
 
-            this.cells = []
+            this.entities = []
             this.currentTurn = 0
             this.entitiesById = {}
         }
