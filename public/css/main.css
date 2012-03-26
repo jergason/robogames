@@ -11,23 +11,23 @@
   top: 0;
   width: 75%;
 }
-.cell {
+.entity {
   background: no-repeat center center;
   background-size: auto 90%;
   position: absolute;
-  -webkit-transition: all 1s linear;
-  -moz-transition: all 1s linear;
-  -ms-transition: all 1s linear;
-  -o-transition: all 1s linear;
-  transition: all 1s linear;
+  -webkit-transition: all 250ms linear;
+  -moz-transition: all 250ms linear;
+  -ms-transition: all 250ms linear;
+  -o-transition: all 250ms linear;
+  transition: all 250ms linear;
 }
-.cell.mine {
+.entity.mine {
   background-image: url("/img/mine.png");
 }
-.cell.finish {
+.entity.finish {
   background-image: url("/img/finish_flag.png");
 }
-.cell.player {
+.entity.player {
   background-image: url("/img/blue_robot.png");
 }
 .selection {
@@ -39,4 +39,6 @@
 }
 .selectionItem {
   list-style: none;
+  padding: 2px 6px;
+  text-align: right;
 }
