@@ -6,3 +6,7 @@ app.js
 games/*.js
 games/*/*.js
 test/*.js
+*.class
+*.log
+*.classpath
+*.project
