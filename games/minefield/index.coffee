@@ -9,58 +9,18 @@ Synchronous: all level moves return synchronously.
 # exports.levelOne = (state, move) ->
 
 _ = require 'underscore'
+fjs = require('fjs').attachPrototype()
 
 exports.modes = modes = 
     dead: "dead"
     play: "play"
     won: "won"
 
-point = (x, y) -> {x, y}
-size = (w, h) -> {w, h}
-
-movePoint = (start, action) ->
-    switch action
-        when "right" then point start.x + 1, start.y
-        when "left" then point start.x - 1, start.y
-        when "up" then point start.x, start.y - 1
-        when "down" then point start.x, start.y + 1
-        else false
-
-withinBounds = (size, p) -> (0 <= p.x < size.w) && (0 <= p.y < size.h)
-
-collision = (mines, p) -> 
-    hits = mines.filter (m) ->
-        m.x == p.x and m.y == p.y 
-    (hits.length > 0)
-
-won = (target, p) -> p.x == target.x and p.y == target.y
-
-
-# standard game function, just handles the move and collisions
-moveState = (currentState, action) ->
-
-    state = _.clone currentState
-
-    # make the move
-    state.player = movePoint state.player, action
-
-    if not withinBounds state.size, state.player
-        return false
-
-    if collision state.mines, state.player
-        state.mode = modes.dead
-
-    else if won state.target, state.player
-        state.mode = modes.won
-
-    state
-
-
 exports.name = "minefield"
 
-exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "puppyGuard"]
+# LEVELS ##################################################################
 
-# Level one just allows you to move
+exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "attackDrone", "puppyGuard", "armyAnts"]
 
 # only have to move one space!
 exports.one = exports.tiny = 
@@ -206,16 +166,193 @@ puppyGuard = ->
 
 exports.puppyGuard = puppyGuard()
 
-hit = (a, b) -> a.x == b.x && a.y == b.y
+
 
 # single mine speeds towards you for the kill
-exports.attackDrones = 
+exports.attackDrone = 
+    start: ->
+        state =
+            mode: modes.play
+            size: size 10, 10 
+            player: point 0, 0
+            target: point 9, 9
+            mines: [ new Mine({x: 5, y:5}, 'a') ]
+
+    move: (state, m) ->
+
+        # let the player move first
+        state = moveState state, m.action
+
+        px = state.player.x
+        py = state.player.y
+
+        ids = byId state
+
+        m = ids.a
+
+        # now move towards it
+        if (m.x < px) then m.x += 1
+        else if (m.x > px) then m.x -= 1
+        else if (m.y < py) then m.y += 1
+        else if (m.y > py) then m.y -= 1
+
+        if collision state.mines, state.player
+            state.mode = modes.dead
+
+        state
+
+
+# every couple of turns the target moves, randomly
+exports.movingTarget = 
+    start: ->
+        state =
+            mode: modes.play
+            size: size 10, 10 
+            player: point 0, 0
+            target: point 9, 9
+            mines: [ new Mine({x: 5, y:5}, 'a') ]
+
+    move: (state, m) ->
+        # let the player move first
+        state = moveState state, m.action
+
+        t = state.target
+
+        # move roughly every couple of turns
+
+
+        move = randomValue allDirections
+
+        t.x += move.x
+        t.y += move.y
+
+        if t.x < 0 then t.x = 0
+        else if t.x >= state.size.w then t.x = state.size.w-1
+
+        if t.y < 0 then t.y = 0
+        else if t.y >= state.size.h then t.y = state.size.h-1
+
+        state
+
+
+# can you finish in a reasonable number of moves?
+exports.huge = 
     start: ->
     move: ->
 
 
+# they move randomly, all over the place!
+exports.armyAnts = 
+    start: -> 
+        w = 10
+        h = 10
+        mine = mines()
+        rmine = -> mine(random(w-2)+1, random(h-2)+1)
+        state =
+            mode: modes.play
+            size: size w, h
+            player: point 0, 0
+            target: point 9, 9
+            mines: [0..17].map rmine
 
+    move: (state, m) ->
+
+        # let the player move first
+        state = moveState state, m.action
+
+        # now, move them all randomly
+        state.mines = state.mines.map randomMovement.partial(state.size)
+
+        # hit and sunk!
+        if collision state.mines, state.player
+            state.mode = modes.dead        
+
+        state
+
+# same as army ants but they won't move on top of you
+exports.armyAntsSafe = {}
+
+
+dstop = {x:0, y:0}
+dleft = {x:-1, y:0}
+dup = {x:0, y:-1}
+ddown = {x:0, y:1}
+dright = {x:1, y:0}
+allDirections = [dstop, dleft, dup, ddown, dright]
+
+randomMovement = (size, m) ->
+    move = randomValue allDirections 
+
+    # work with a copy
+
+    m = _.clone m
+
+    m.x += move.x
+    m.y += move.y
+
+    if m.x < 0 then m.x = 0
+    else if m.x >= size.w then m.x = size.w-1
+
+    if m.y < 0 then m.y = 0
+    else if m.y >= size.h then m.y = size.h-1 
+
+    m
+
+
+
+
+
+
+# HELPERS #############################################################
+
+point = (x, y) -> {x, y}
+size = (w, h) -> {w, h}
+
+movePoint = (start, action) ->
+    switch action
+        when "right" then point start.x + 1, start.y
+        when "left" then point start.x - 1, start.y
+        when "up" then point start.x, start.y - 1
+        when "down" then point start.x, start.y + 1
+        else false
+
+withinBounds = (size, p) -> (0 <= p.x < size.w) && (0 <= p.y < size.h)
+
+collision = (mines, p) -> 
+    hits = mines.filter hit.partial(p)
+    (hits.length > 0)
+
+won = (target, p) -> p.x == target.x and p.y == target.y
+
+
+# standard game function, just handles the move and collisions
+moveState = (currentState, action) ->
+
+    state = _.clone currentState
+
+    # make the move
+    state.player = movePoint state.player, action
+
+    if not withinBounds state.size, state.player
+        return false
+
+    if collision state.mines, state.player
+        state.mode = modes.dead
+
+    else if won state.target, state.player
+        state.mode = modes.won
+
+    state
+
+
+
+
+
+# if you need to reference a point in a hash
 pkey = (x, y) -> x + "," + y
+
+# whether two points are the same
+hit = (a, b) -> a.x == b.x && a.y == b.y
 
 # returns a map of stuff by pkey
 byLocation = (state) ->
@@ -233,6 +370,7 @@ byId = (state) ->
     map
 
 random = (n) -> Math.floor(Math.random() * n)
+randomValue = (arr) -> arr[random(arr.length)] 
 
 # returns a mine function that create a mine with a unique id 
 mines = ->

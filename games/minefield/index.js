@@ -8,9 +8,11 @@ Synchronous: all level moves return synchronously.
 */
 
 (function() {
-  var Mine, byId, byLocation, collision, hit, mine, mines, modes, movePoint, moveState, pkey, point, puppyGuard, random, size, withinBounds, won, _;
+  var Mine, allDirections, byId, byLocation, collision, ddown, dleft, dright, dstop, dup, fjs, hit, mine, mines, modes, movePoint, moveState, pkey, point, puppyGuard, random, randomMovement, randomValue, size, withinBounds, won, _;
 
   _ = require('underscore');
+
+  fjs = require('fjs').attachPrototype();
 
   exports.modes = modes = {
     dead: "dead",
@@ -18,69 +20,10 @@ Synchronous: all level moves return synchronously.
     won: "won"
   };
 
-  point = function(x, y) {
-    return {
-      x: x,
-      y: y
-    };
-  };
-
-  size = function(w, h) {
-    return {
-      w: w,
-      h: h
-    };
-  };
-
-  movePoint = function(start, action) {
-    switch (action) {
-      case "right":
-        return point(start.x + 1, start.y);
-      case "left":
-        return point(start.x - 1, start.y);
-      case "up":
-        return point(start.x, start.y - 1);
-      case "down":
-        return point(start.x, start.y + 1);
-      default:
-        return false;
-    }
-  };
-
-  withinBounds = function(size, p) {
-    var _ref, _ref2;
-    return ((0 <= (_ref = p.x) && _ref < size.w)) && ((0 <= (_ref2 = p.y) && _ref2 < size.h));
-  };
-
-  collision = function(mines, p) {
-    var hits;
-    hits = mines.filter(function(m) {
-      return m.x === p.x && m.y === p.y;
-    });
-    return hits.length > 0;
-  };
-
-  won = function(target, p) {
-    return p.x === target.x && p.y === target.y;
-  };
-
-  moveState = function(currentState, action) {
-    var state;
-    state = _.clone(currentState);
-    state.player = movePoint(state.player, action);
-    if (!withinBounds(state.size, state.player)) return false;
-    if (collision(state.mines, state.player)) {
-      state.mode = modes.dead;
-    } else if (won(state.target, state.player)) {
-      state.mode = modes.won;
-    }
-    return state;
-  };
-
   exports.name = "minefield";
 
   exports.levels = function() {
-    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "puppyGuard"];
+    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "attackDrone", "puppyGuard", "armyAnts"];
   };
 
   exports.one = exports.tiny = {
@@ -235,17 +178,221 @@ Synchronous: all level moves return synchronously.
 
   exports.puppyGuard = puppyGuard();
 
-  hit = function(a, b) {
-    return a.x === b.x && a.y === b.y;
+  exports.attackDrone = {
+    start: function() {
+      var state;
+      return state = {
+        mode: modes.play,
+        size: size(10, 10),
+        player: point(0, 0),
+        target: point(9, 9),
+        mines: [
+          new Mine({
+            x: 5,
+            y: 5
+          }, 'a')
+        ]
+      };
+    },
+    move: function(state, m) {
+      var ids, px, py;
+      state = moveState(state, m.action);
+      px = state.player.x;
+      py = state.player.y;
+      ids = byId(state);
+      m = ids.a;
+      if (m.x < px) {
+        m.x += 1;
+      } else if (m.x > px) {
+        m.x -= 1;
+      } else if (m.y < py) {
+        m.y += 1;
+      } else if (m.y > py) {
+        m.y -= 1;
+      }
+      if (collision(state.mines, state.player)) state.mode = modes.dead;
+      return state;
+    }
   };
 
-  exports.attackDrones = {
+  exports.movingTarget = {
+    start: function() {
+      var state;
+      return state = {
+        mode: modes.play,
+        size: size(10, 10),
+        player: point(0, 0),
+        target: point(9, 9),
+        mines: [
+          new Mine({
+            x: 5,
+            y: 5
+          }, 'a')
+        ]
+      };
+    },
+    move: function(state, m) {
+      var move, t;
+      state = moveState(state, m.action);
+      t = state.target;
+      move = randomValue(allDirections);
+      t.x += move.x;
+      t.y += move.y;
+      if (t.x < 0) {
+        t.x = 0;
+      } else if (t.x >= state.size.w) {
+        t.x = state.size.w - 1;
+      }
+      if (t.y < 0) {
+        t.y = 0;
+      } else if (t.y >= state.size.h) {
+        t.y = state.size.h - 1;
+      }
+      return state;
+    }
+  };
+
+  exports.huge = {
     start: function() {},
     move: function() {}
   };
 
+  exports.armyAnts = {
+    start: function() {
+      var h, mine, rmine, state, w;
+      w = 10;
+      h = 10;
+      mine = mines();
+      rmine = function() {
+        return mine(random(w - 2) + 1, random(h - 2) + 1);
+      };
+      return state = {
+        mode: modes.play,
+        size: size(w, h),
+        player: point(0, 0),
+        target: point(9, 9),
+        mines: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(rmine)
+      };
+    },
+    move: function(state, m) {
+      state = moveState(state, m.action);
+      state.mines = state.mines.map(randomMovement.partial(state.size));
+      if (collision(state.mines, state.player)) state.mode = modes.dead;
+      return state;
+    }
+  };
+
+  exports.armyAntsSafe = {};
+
+  dstop = {
+    x: 0,
+    y: 0
+  };
+
+  dleft = {
+    x: -1,
+    y: 0
+  };
+
+  dup = {
+    x: 0,
+    y: -1
+  };
+
+  ddown = {
+    x: 0,
+    y: 1
+  };
+
+  dright = {
+    x: 1,
+    y: 0
+  };
+
+  allDirections = [dstop, dleft, dup, ddown, dright];
+
+  randomMovement = function(size, m) {
+    var move;
+    move = randomValue(allDirections);
+    m = _.clone(m);
+    m.x += move.x;
+    m.y += move.y;
+    if (m.x < 0) {
+      m.x = 0;
+    } else if (m.x >= size.w) {
+      m.x = size.w - 1;
+    }
+    if (m.y < 0) {
+      m.y = 0;
+    } else if (m.y >= size.h) {
+      m.y = size.h - 1;
+    }
+    return m;
+  };
+
+  point = function(x, y) {
+    return {
+      x: x,
+      y: y
+    };
+  };
+
+  size = function(w, h) {
+    return {
+      w: w,
+      h: h
+    };
+  };
+
+  movePoint = function(start, action) {
+    switch (action) {
+      case "right":
+        return point(start.x + 1, start.y);
+      case "left":
+        return point(start.x - 1, start.y);
+      case "up":
+        return point(start.x, start.y - 1);
+      case "down":
+        return point(start.x, start.y + 1);
+      default:
+        return false;
+    }
+  };
+
+  withinBounds = function(size, p) {
+    var _ref, _ref2;
+    return ((0 <= (_ref = p.x) && _ref < size.w)) && ((0 <= (_ref2 = p.y) && _ref2 < size.h));
+  };
+
+  collision = function(mines, p) {
+    var hits;
+    hits = mines.filter(hit.partial(p));
+    return hits.length > 0;
+  };
+
+  won = function(target, p) {
+    return p.x === target.x && p.y === target.y;
+  };
+
+  moveState = function(currentState, action) {
+    var state;
+    state = _.clone(currentState);
+    state.player = movePoint(state.player, action);
+    if (!withinBounds(state.size, state.player)) return false;
+    if (collision(state.mines, state.player)) {
+      state.mode = modes.dead;
+    } else if (won(state.target, state.player)) {
+      state.mode = modes.won;
+    }
+    return state;
+  };
+
   pkey = function(x, y) {
     return x + "," + y;
+  };
+
+  hit = function(a, b) {
+    return a.x === b.x && a.y === b.y;
   };
 
   byLocation = function(state) {
@@ -273,6 +420,10 @@ Synchronous: all level moves return synchronously.
 
   random = function(n) {
     return Math.floor(Math.random() * n);
+  };
+
+  randomValue = function(arr) {
+    return arr[random(arr.length)];
   };
 
   mines = function() {
