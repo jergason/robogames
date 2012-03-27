@@ -11,23 +11,29 @@ function (_
     return View.extend({
         template: template,
 
-        initialize: function (model) {
+        initialize: function (type, model) {
+            console.log(type, model)
+            this.type = type
             this.model = model
-            this.$level = this.$el.find(".level")
+
             this.$link = this.$el.find(".link")
-            this.$user = this.$el.find(".user")
-            this.$state = this.$el.find(".state")
+
+            this.$el.addClass(type)
+
             this.render()
         },
 
         render: function () {
-            this.$level.text(this.model.level)
-            this.$link.attr("href", "#/game/" + this.model.gameId)
-            if (this.model.player && this.model.player.username) {
-                this.$user.text(this.model.player.username)
+            if (this.type === "game") {
+                this.$link.attr("href", "#/game/" + this.model.gameId)
+                this.$link.text(this.model.level)
             }
-            if (this.model.state.mode) {
-                this.$state.text(this.model.state.mode)
+            else {
+                if (!(this.model instanceof Array)) return
+                var wins = this.model.filter(function (m) {
+                    return m.state.mode === "won"
+                })
+                this.$link.text(this.model[0].player.username + " - won " + wins.length)
             }
         }
     })
