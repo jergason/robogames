@@ -215,6 +215,8 @@ exports.movingTarget =
     move: (state, m) ->
         # let the player move first
         state = moveState state, m.action
+        # if the player hits it, then be done
+        if state.mode == modes.won then return state
 
         t = state.target
 
@@ -231,6 +233,10 @@ exports.movingTarget =
 
         if t.y < 0 then t.y = 0
         else if t.y >= state.size.h then t.y = state.size.h-1
+
+        # check if the flag moved on top of the player  (win)
+        if won state.target, state.player
+            state.mode = modes.won
 
         state
 
@@ -292,7 +298,7 @@ exports.blackAnts =
         # now, move them all randomly
         state.mines = state.mines.map (m) ->
             newM = randomMovement(state.size, m)
-            console.log "NEW MINES!", m, newM
+            #console.log "NEW MINES!", m, newM
             if hit(newM, state.player) then m else newM
 
         state 
@@ -347,7 +353,9 @@ collision = (mines, p) ->
     hits = mines.filter hit.partial(p)
     (hits.length > 0)
 
-won = (target, p) -> p.x == target.x and p.y == target.y
+won = (target, p) -> 
+    #console.log "checking if won!", target, p
+    p.x == target.x and p.y == target.y
 
 
 # standard game function, just handles the move and collisions
