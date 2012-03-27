@@ -69,7 +69,7 @@ exports.randomMines =
         w = 10
         h = 10
         mine = mines()
-        rmine = -> mine(random(w-2), random(h-2))
+        rmine = -> mine(random(w-2)+1, random(h-2))
         state =
             mode: modes.play
             size: size w, h
@@ -254,7 +254,7 @@ exports.armyAnts =
         w = 10
         h = 10
         mine = mines()
-        rmine = -> mine(random(w-2)+1, random(h-2)+1)
+        rmine = -> mine(random(w-2)+1, random(h-2))
         state =
             mode: modes.play
             size: size w, h
@@ -282,7 +282,7 @@ exports.blackAnts =
         w = 10
         h = 10
         mine = mines()
-        rmine = -> mine(random(w-2)+1, random(h-2)+1)
+        rmine = -> mine(random(w-2)+1, random(h-2))
         state =
             mode: modes.play
             size: size w, h
