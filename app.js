@@ -46,10 +46,19 @@
         return res.send(state);
       });
     });
+    app.use("*.txt", function(req, res, next) {
+      res.contentType(".txt");
+      return next();
+    });
     app.get("/minefield/levels", function(req, res) {
       return res.send(minefield.levels());
     });
-    app.get("/minefield/levels/:level/games", notImplemented);
+    app.get("/minefield/levels/:level/games", function(req, res) {
+      return games.byLevel(minefield, req.param('level'), function(err, games) {
+        if (err != null) return res.send(err, 500);
+        return res.send(games);
+      });
+    });
     app.get("/games/:gameId", function(req, res) {
       return games.fetch(req.param('gameId'), function(err, game) {
         if (err != null) return res.send(err, 500);
@@ -68,7 +77,6 @@
       return games.fetch(req.param('gameId'), function(err, game) {
         if (err != null) return res.send(err, 500);
         if (!game) return res.send(404);
-        res.contentType(".txt");
         return res.send(textualize(game.state));
       });
     });
@@ -79,7 +87,6 @@
       return games.fetchStateAtTurn(gameId, n, function(err, state) {
         if (err != null) return res.send(err, 500);
         if (!state) return res.send(404);
-        res.contentType(".txt");
         return res.send(textualize(state));
       });
     });
@@ -93,7 +100,18 @@
         return res.send(state);
       });
     });
-    app.get("/players/:username/games", notImplemented);
+    app.get("/players/leaderboard", function(req, res) {
+      return games.leaderboard(function(err, leaders) {
+        if (err != null) return res.send(err, 500);
+        return res.send(leaders);
+      });
+    });
+    app.get("/players/:username/games", function(req, res) {
+      return games.byPlayer(req.param('username'), function(err, games) {
+        if (err != null) return res.send(err, 500);
+        return res.send(games);
+      });
+    });
     return app;
   };
 

@@ -20,6 +20,9 @@ The front-end for the different games. Handles storage and retreival of game sta
       this.index = exports.index.partial(collection);
       this.fetch = exports.fetch.partial(collection);
       this.fetchStateAtTurn = exports.fetchStateAtTurn.partial(collection);
+      this.leaderboard = exports.leaderboard.partial(collection);
+      this.byPlayer = exports.byPlayer.partial(collection);
+      this.byLevel = exports.byLevel.partial(collection);
     }
 
     return Model;
@@ -32,6 +35,90 @@ The front-end for the different games. Handles storage and retreival of game sta
     return games.findOne({
       gameId: gameId
     }, cb);
+  };
+
+  exports.leaderboard = function(games, cb) {
+    return games.find({
+      "state.mode": "won"
+    }, {
+      _id: 0,
+      level: 1,
+      "player.username": 1,
+      "state.mode": "state.mode",
+      "gameId": 1
+    }).toArray(function(err, docs) {
+      var byUsername, g, obj, un, usernameGamesArray, _i, _len;
+      if (err != null) return cb(err);
+      games = docs;
+      byUsername = {};
+      for (_i = 0, _len = games.length; _i < _len; _i++) {
+        g = games[_i];
+        un = g.player.username;
+        if (byUsername[un] == null) {
+          byUsername[un] = {
+            username: g.player.username,
+            games: [],
+            wins: 0
+          };
+        }
+        byUsername[un].games.push({
+          level: g.level,
+          gameId: g.gameId
+        });
+        byUsername[un].wins++;
+      }
+      usernameGamesArray = [];
+      for (un in byUsername) {
+        obj = byUsername[un];
+        usernameGamesArray.push(obj);
+      }
+      usernameGamesArray.sort(function(a, b) {
+        return a.games.length - b.games.length;
+      });
+      return cb(null, usernameGamesArray);
+    });
+  };
+
+  exports.byPlayer = function(games, username, cb) {
+    return games.find({
+      "player.username": username
+    }, {
+      _id: 0,
+      level: 1,
+      gameId: 1,
+      "state.mode": 1
+    }).toArray(function(err, docs) {
+      if (err != null) return cb(err);
+      return cb(null, docs.map(function(d) {
+        return {
+          gameId: d.gameId,
+          level: d.level,
+          won: d.state.mode === "won"
+        };
+      }));
+    });
+  };
+
+  exports.byLevel = function(games, game, levelName, cb) {
+    return games.find({
+      name: game.name,
+      level: levelName
+    }, {
+      _id: 0,
+      gameId: 1,
+      "player.username": 1,
+      "state.mode": 1
+    }).toArray(function(err, games) {
+      if (err != null) return cb(err);
+      games = games.map(function(g) {
+        return {
+          gameId: g.gameId,
+          username: g.player.username,
+          won: g.state.mode === "won"
+        };
+      });
+      return cb(null, games);
+    });
   };
 
   exports.play = function(games, game, levelName, player, cb) {

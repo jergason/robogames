@@ -15,6 +15,9 @@ class Model
         @index = exports.index.partial collection
         @fetch = exports.fetch.partial collection
         @fetchStateAtTurn = exports.fetchStateAtTurn.partial collection
+        @leaderboard = exports.leaderboard.partial collection
+        @byPlayer = exports.byPlayer.partial collection
+        @byLevel = exports.byLevel.partial collection
 
 
 exports.Model = Model
@@ -23,6 +26,42 @@ exports.Model = Model
 # just dumps out the game from the db
 exports.fetch = (games, gameId, cb) -> games.findOne({gameId:gameId}, cb)
 
+
+exports.leaderboard = (games, cb) ->
+    games.find({"state.mode":"won"}, {_id: 0, level: 1, "player.username": 1, "state.mode", "gameId": 1}).toArray (err, docs) ->
+        if err? then return cb err
+
+        games = docs
+
+        byUsername = {}
+
+        for g in games
+            un = g.player.username
+            byUsername[un] ?= {username: g.player.username, games: [], wins: 0}
+            byUsername[un].games.push {level: g.level, gameId: g.gameId}
+            byUsername[un].wins++
+
+        usernameGamesArray = []
+        for un, obj of byUsername
+            usernameGamesArray.push obj
+
+        usernameGamesArray.sort (a, b) -> 
+            return a.games.length - b.games.length
+
+        cb null, usernameGamesArray
+
+
+exports.byPlayer = (games, username, cb) ->
+    games.find({"player.username":username}, {_id: 0, level: 1, gameId: 1, "state.mode": 1}).toArray (err, docs) ->
+        if err? then return cb err
+        cb null, docs.map (d) -> {gameId: d.gameId, level: d.level, won: (d.state.mode == "won")}
+
+exports.byLevel = (games, game, levelName, cb) ->
+    games.find({name: game.name, level: levelName}, {_id: 0, gameId: 1, "player.username": 1, "state.mode": 1}).toArray (err, games) ->
+        if err? then return cb err
+        games = games.map (g) ->
+            {gameId: g.gameId, username: g.player.username, won: (g.state.mode == "won")}
+        cb null, games
 
 # start the game
 # needs: gameId and starting state

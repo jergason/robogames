@@ -20,7 +20,7 @@ exports.name = "minefield"
 
 # LEVELS ##################################################################
 
-exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "attackDrone", "puppyGuard", "armyAnts"]
+exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "heatSeeking", "puppyGuard", "armyAnts"]
 
 # only have to move one space!
 exports.one = exports.tiny = 
@@ -169,7 +169,7 @@ exports.puppyGuard = puppyGuard()
 
 
 # single mine speeds towards you for the kill
-exports.attackDrone = 
+exports.heatSeeking = 
     start: ->
         state =
             mode: modes.play

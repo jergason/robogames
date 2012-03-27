@@ -71,12 +71,20 @@ exports.createServer = ->
 
     # ADMIN / VIEWER ######################################################
 
+
+    app.use "*.txt", (req, res, next) ->
+        res.contentType ".txt"
+        next()
+
     # ret: ["levelId"]
     app.get "/minefield/levels", (req, res) ->
         res.send minefield.levels()
 
-    # ret: ["gameId"]
-    app.get "/minefield/levels/:level/games", notImplemented
+    # ret: [{gameId, username}] +# of turns taken
+    app.get "/minefield/levels/:level/games", (req, res) ->
+        games.byLevel minefield, req.param('level'), (err, games) ->
+            if err? then return res.send err, 500
+            res.send games
 
     # returns a game, with latest state and all states
     # ret: Game {gameId, level, name, player: Player, state: State, states: [State]}
@@ -99,16 +107,15 @@ exports.createServer = ->
         games.fetch req.param('gameId'), (err, game) ->
             if err? then return res.send err, 500
             if !game then return res.send 404
-            res.contentType ".txt"
             res.send textualize game.state
 
+    # must go before the n route
     app.get "/games/:gameId/state/:n.txt", (req, res) ->
         gameId = req.param('gameId')
         n = parseInt(req.param('n'), 10)
         games.fetchStateAtTurn gameId, n, (err, state) ->
             if err? then return res.send err, 500
             if !state then return res.send 404
-            res.contentType ".txt"
             res.send textualize state
 
     app.get "/games/:gameId/state/:n", (req, res) ->
@@ -119,15 +126,22 @@ exports.createServer = ->
             if !state then return res.send 404
             res.send state
 
+    # the top players, but # of levels completed, just brute force it
+    # [{username, wins: N, games:[{gameId, level}]}]
+    app.get "/players/leaderboard", (req, res) ->
+        games.leaderboard (err, leaders) ->
+            if err? then return res.send err, 500
+            res.send leaders
 
-
-
-
-    # ret: ["gameId"]
-    app.get "/players/:username/games", notImplemented
+    # ret: [{gameId, level, won:true|false}]
+    app.get "/players/:username/games", (req, res) ->
+        games.byPlayer req.param('username'), (err, games) ->
+            if err? then return res.send err, 500
+            res.send games
 
 
     app
+
 
 
 textualize = (s) -> debug.dump(debug.toRows(s))

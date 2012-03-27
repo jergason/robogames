@@ -23,7 +23,7 @@ Synchronous: all level moves return synchronously.
   exports.name = "minefield";
 
   exports.levels = function() {
-    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "attackDrone", "puppyGuard", "armyAnts"];
+    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "heatSeeking", "puppyGuard", "armyAnts"];
   };
 
   exports.one = exports.tiny = {
@@ -178,7 +178,7 @@ Synchronous: all level moves return synchronously.
 
   exports.puppyGuard = puppyGuard();
 
-  exports.attackDrone = {
+  exports.heatSeeking = {
     start: function() {
       var state;
       return state = {
