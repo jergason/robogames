@@ -111,6 +111,3 @@ heatSeeking - a single mine heads straight for you, watch out!
 puppyGuard - a few mines patrol the way to your goal, can you get past?
 armyAnts - the ultimate challenge, tons of mines move randomly without regard to your position
 
-Viewing your game
--------------------------
-In addition to the web frontend
