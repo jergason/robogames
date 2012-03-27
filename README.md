@@ -20,8 +20,9 @@ where :level is a level (see below for a list of levels)
 and post body is:
 
 ```javascript
-    { username: "username, //required
-    email: "youremail@email.com" // optional
+    { 
+    username: "username", //required
+    email: "youremail@email.com", // optional
     link: "github.com/name/yourcode" //optional
     }
 ```
@@ -31,8 +32,9 @@ encoded as JSON or form-encoded
 it returns a JSON object:
 
 ```javascript
-    { gameId: 'exampleId', // a random Id
-      state: StateObj // (see state below)
+    { 
+    gameId: 'exampleId', // a random Id
+    state: StateObj // (see state below)
     }
 ```  
 
@@ -64,7 +66,8 @@ For each gameId, the server keeps track of the current game state and all prior 
 On starting a game and on each subsequent move, the new game state is returned which is as below:
 
 ```javascript
-    { mode: 'play', // valid modes are "play", "dead", and "won"
+    { 
+    mode: 'play', // valid modes are "play", "dead", and "won"
     size: { w: 2, h: 2 }, // the size of the board
     player: { x: 0, y: 0 }, // the players current positon
     target: { x: 0, y: 1 }, // the goal you want to get to
