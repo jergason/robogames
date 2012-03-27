@@ -1,23 +1,28 @@
 <?php
 
 $username = "myname";
-$level = 1;
+$level = "one";
 
-$host = "http://dev.i.tv:300";
-$newGameUrl = $host . "/minefield/level" . $level;
+$host = "http://dev.i.tv:2663";
+$newGameUrl = $host . "/minefield/level/" . $level . "/games";
 
-$postBody = "username=" . $username;
+$postBody = array(
+    "username" => urlencode($username),
+    "email" => urlencode("youremail@email.com"),
+    "link" => urlencode("a webpage about you"));
 
 $ch = curl_init();
 
 curl_setopt($ch, CURLOPT_URL, $newGameUrl);
-curl_setopt($ch,CURLOPT_POST,1);
-curl_setopt($ch,CURLOPT_POSTFIELDS,$postBody);
+//curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, formEncode($postBody));
 
 //execute post
 $result = json_decode(curl_exec($ch));
 //close connection
 curl_close($ch);
+
+print_r($result);
 
 $gameId = $result['gameId'];
 
@@ -33,7 +38,7 @@ function makeMove($host, $gameId, $move) {
     $mch = curl_init();
 
     curl_setopt($mch, CURLOPT_URL, $moveUrl);
-    curl_setopt($mch, CURLOPT_POST, 1);
+    curl_setopt($mch, CURLOPT_POST, true);
     curl_setopt($mch, CURLOPT_POSTFIELDS, $moveBody);
 
     $mRes = json_decode(curl_exec($mch));
@@ -41,4 +46,12 @@ function makeMove($host, $gameId, $move) {
     return $mRes;
 }
 
+function formEncode($arr) {
+    $fields_string = "";
+    foreach($arr as $key=>$value) { 
+        $fields_string .= $key.'='.$value.'&'; 
+    }
+    var_dump($fields_string);
+    return rtrim($fields_string,'&');
+}
 ?>
