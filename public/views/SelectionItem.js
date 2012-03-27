@@ -12,7 +12,6 @@ function (_
         template: template,
 
         initialize: function (type, model) {
-            console.log(type, model)
             this.type = type
             this.model = model
 
