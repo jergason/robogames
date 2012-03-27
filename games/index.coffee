@@ -18,6 +18,8 @@ class Model
         @leaderboard = exports.leaderboard.partial collection
         @byPlayer = exports.byPlayer.partial collection
         @byLevel = exports.byLevel.partial collection
+        @getGames = exports.getGames.partial collection
+        @getGameById = exports.getGameById.partial collection
 
 
 exports.Model = Model
@@ -68,6 +70,7 @@ exports.byLevel = (games, game, levelName, cb) ->
 exports.play = (games, game, levelName, player, cb) ->
     gameId = uniqueId()
     level = game[levelName]
+    if not level then return cb(new Error("Invalid Level"))
     state = level.start()
 
     # store the game and return it to the player
@@ -84,7 +87,7 @@ exports.move = (games, game, gameId, move, cb) ->
         state = level.move g.state, move
 
         if not state
-            return cb new Error "Invalid Move"
+            return cb( new Error "Invalid Move")
 
         updateState games, gameId, state, cb  
 
@@ -122,8 +125,21 @@ storeGame = (games, game, cb) ->
         cb null, game.summary()
 
 
+exports.getGames = (games, cb) ->
+    games.find({}).toArray (err, docs) ->
+        if err? then return cb err
+        if not docs then return cb(new Error("no games find"))
 
+        gameObjs = []
+        for doc in docs
+            gameObjs.push Game.convert doc
 
+        cb null, gameObjs
+
+exports.getGameById = (games, gameId, cb) ->
+    games.findOne {gameId: gameId}, (err, doc) ->
+        if err? then return cb err
+        cb null, doc
 
 uniqueId = -> Math.random().toString(36).replace("0.", "")
 

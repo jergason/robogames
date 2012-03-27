@@ -2,3 +2,7 @@
 node_modules
 *.log
 solution*
+app.js
+games/*.js
+games/*/*.js
+test/*.js

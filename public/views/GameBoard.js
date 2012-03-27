@@ -1,41 +1,33 @@
 define( [ "underscore"
         , "views/View"
         , "text!views/GameBoard.html"
-        , "views/Cell"
-       ],
+        , "views/Entity"
+        ],
        
 function (_
         , View
         , template
-        , CellView
+        , EntityView
         ) {
 
     return View.extend({
         template: template,
 
-        initialize: function (model) {
-            this.model = model
-
-            this.cells = []
-            this.cellsByCoordnate = []
-
-            this.aspect = 480 / 640
-
+        initialize: function () {
             $(window).resize(_.bind(this.resize, this))
 
-            // this.generateCells()
-
-            this.currentTurn = 0
-            this.entitiesById = {}
-            
+            this.reset()
         },
 
         render: function () {
-            var turn = this.model.turns[this.currentTurn]
+            var state = this.model.states[this.currentTurn]
+            this.$el.css("background-size", this.scale)
 
-            for (var i = 0; i < turn.mines.length; i++) {
-                this.renderEntity("mine", turn.mines[i])
+            for (var i = 0; i < state.mines.length; i++) {
+                this.renderEntity("mine", state.mines[i])
             }
+            this.renderEntity("finish", {x: state.target.x, y: state.target.y, id: "finish"})
+            this.renderEntity("player", {x: state.player.x, y: state.player.y, id: "player"})
         },
 
         renderEntity: function (type, entityModel) {
@@ -49,59 +41,38 @@ function (_
         },
 
         addEntity: function (type, entityModel) {
-            var entity = new CellView(entityModel, type)
+            var entity = new EntityView(entityModel, type)
             this.$el.append(entity.$el)
 
             entity.setScale(this.scale)
 
             this.entitiesById[entityModel.id] = entity
-            this.cells.push(entity)
+            this.entities.push(entity)
         },
 
-        generateCells: function () {
-            for (var x = 0; x < this.model.width; x++) {
-                for (var y = 0; y < this.model.height; y++) {
-                    this.addCellView(new CellView({
-                        x: x,
-                        y: y
-                    }))
-                }
+        updateEntityScales: function () {
+            for (var i = 0; i < this.entities.length; i++) {
+                this.entities[i].setScale(this.scale)
             }
-        },
-
-        updateCellScales: function () {
-            for (var i = 0; i < this.cells.length; i++) {
-                this.cells[i].setScale(this.scale)
-            }
-        },
-
-        addCellView: function (cellView) {
-            var x = cellView.getX()
-            var y = cellView.getY()
-            
-            if (!this.cellsByCoordnate[x]) this.cellsByCoordnate[x] = []
-            this.cellsByCoordnate[x][y] = cellView
-            this.cells.push(cellView)
-
-            this.$el.append(cellView.$el)
         },
 
         resize: function () {
+            if (!this.model) return
             this.calculateScale()
-            this.updateCellScales()
+            this.updateEntityScales()
             this.render()
         },
 
         calculateScale: function () {
-            var width = this.$el.width()
             var height = this.$el.height()
 
-            this.scale = Math.floor(width / this.model.width)
+            this.scale = Math.floor(height / this.model.state.size.h)
+            this.$el.width(this.scale * this.model.state.size.w + 1)
         },
 
         play: function () {
             if (this.interval) return
-            this.interval = setInterval(_.bind(this.tick, this), 2000)
+            this.interval = setInterval(_.bind(this.tick, this), 500)
         },
 
         stop: function () {
@@ -110,13 +81,39 @@ function (_
         },
 
         tick: function () {
-            if (this.model.turns[this.currentTurn + 1]) {
+            if (this.model.states[this.currentTurn + 1]) {
                 this.currentTurn++
                 this.render()
             }
             else {
                 this.stop()
             }
+        },
+
+        playGame: function (gameId) {
+            var self = this
+            this.reset()
+
+            $.get("/minefield/games/" + gameId, function (game) {
+                self.model = game
+                self.resize()
+                self.play()
+                self.render()
+            })
+        },
+
+        reset: function () {
+            this.stop()
+
+            if (this.entities) {
+                for (var i = 0; i < this.entities.length; i++) {
+                    this.entities[i].destroy()
+                }
+            }
+
+            this.entities = []
+            this.currentTurn = 0
+            this.entitiesById = {}
         }
     })
 })

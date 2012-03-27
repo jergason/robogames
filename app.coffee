@@ -1,6 +1,3 @@
-
-
-
 PORT = process.env.PORT || 2663
 MONGODB_HOST = process.env.MONGODB_HOST || "localhost"
 
@@ -14,8 +11,6 @@ debug = require './games/debug'
 minefield = require './games/minefield'
 
 exports.createServer = ->
-
-
     app = express.createServer()
     app.use express.bodyParser()
     app.use connectLess({ src: __dirname + '/public' })
@@ -29,15 +24,7 @@ exports.createServer = ->
     # games
     games = new Games(db.games)
 
-
-
-
     # BROWSER #############################################################
-
-
-
-
-
     # PLAY THE GAME #######################################################
 
 
@@ -51,20 +38,18 @@ exports.createServer = ->
     app.post "/minefield/levels/:level/games", (req, res) ->
         level = req.param "level"
         player = req.body
+        if not player.username then return res.send "Need a username!", 500
         games.play minefield, level, player, (err, game) ->
-            if err? then return res.send err, 500
+            if err? then return res.send err.message, 500
             res.send game
-
-
-
     # makes a move, and returns the new game state
     # body: Move {action: "right|left|down|up"} 
     # ret: State (see above)
     app.post "/minefield/:gameId/moves", (req, res) ->
-        gameId = req.param "gameId"
+        gameId = req.params.gameId
         move = req.body
         games.move minefield, gameId, move, (err, state) ->
-            if err? then return res.send err, 500
+            if err? then return res.send err.message, 500
             res.send state
 
 
@@ -139,9 +124,22 @@ exports.createServer = ->
             if err? then return res.send err, 500
             res.send games
 
+    # ret: ["gameId"]
+    app.get "/minefield/games", (req, res) ->
+        games.getGames (err, docs) ->
+            if err? then return res.send err.message, 500
+            if not docs then return res.send "No games found", 404
+            res.send docs
+
+    # returns a game, with latest state and all states
+    app.get "/minefield/games/:gameId", (req, res) ->
+        gameId = req.params.gameId
+        games.getGameById gameId, (err, doc) ->
+            if err? then return res.send err.message, 500
+            if not doc then return res.send "Game not found", 404
+            res.send doc
 
     app
-
 
 
 textualize = (s) -> debug.dump(debug.toRows(s))
