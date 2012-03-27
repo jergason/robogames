@@ -20,6 +20,7 @@ class Model
         @byLevel = exports.byLevel.partial collection
         @getGames = exports.getGames.partial collection
         @getGameById = exports.getGameById.partial collection
+        @entrants = exports.entrants.partial collection
 
 
 exports.Model = Model
@@ -28,6 +29,25 @@ exports.Model = Model
 # just dumps out the game from the db
 exports.fetch = (games, gameId, cb) -> games.findOne({gameId:gameId}, cb)
 
+# returns the list of entrants
+exports.entrants = (games, withDupes, cb) ->
+    query = {
+        "level" : {"$nin" : ["one", "easy"]}
+    }
+    games.find({"state.mode":"won", query}, {_id: 0, "player.username": 1}).toArray (err, docs) ->
+        if err? then return cb err
+
+        
+        usernames = []
+        userObj = {}
+        for d in docs
+            usernames.push d.player.username
+            userObj[d.player.username] = true
+
+        if not withDupes
+            usernames = Object.keys(userObj)
+
+        cb null, usernames
 
 exports.leaderboard = (games, cb) ->
     games.find({"state.mode":"won"}, {_id: 0, level: 1, "player.username": 1, "state.mode", "gameId": 1}).toArray (err, docs) ->
