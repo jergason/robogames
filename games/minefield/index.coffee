@@ -58,7 +58,7 @@ moveState = (currentState, action) ->
 
 exports.name = "minefield"
 
-exports.levels = -> ["tiny", "empty", "easy", "lotsOfMines"]
+exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "puppyGuard"]
 
 # Level one just allows you to move
 
@@ -102,8 +102,26 @@ exports.three = exports.easy =
     move: (state, m) -> 
         moveState state, m.action
 
-# these mines were randomly generated
-exports.lotsOfMines = 
+# this is only hard if you've been hard coding your paths
+# to pass this off, make them RERUN the game.
+exports.randomMines = 
+    start: -> 
+        w = 10
+        h = 10
+        mine = mines()
+        rmine = -> mine(random(w-2), random(h-2))
+        state =
+            mode: modes.play
+            size: size w, h
+            player: point 0, 0
+            target: point 9, 9
+            mines: [0..8].map (n) -> rmine()
+
+    move: (state, m) -> 
+        moveState state, m.action
+
+# little traps
+exports.muchosMines = 
     start: -> 
         mine = mines()
         state =
@@ -111,7 +129,7 @@ exports.lotsOfMines =
             size: size 10, 10 
             player: point 0, 0
             target: point 9, 9
-            mines: [ mine(0, 5)
+            mines: [ mine(0, 4)
                    , mine(0, 9)
                    , mine(1, 7)
                    , mine(3, 2)
@@ -136,6 +154,85 @@ exports.lotsOfMines =
 
 
 
+# guards the exit. Mines will NOT move on top of you
+# Hard+++ (reference implementation fails)
+puppyGuard = ->
+
+    pa1 = {x:8, y:9}
+    pa2 = {x:7, y:9}
+
+    pb1 = {x:9, y:7}
+    pb2 = {x:9, y:8}
+
+    start = ->
+
+        state =
+            mode: modes.play
+            size: size 10, 10 
+            player: point 0, 0
+            target: point 9, 9
+            mines: [ new Mine(pa1, 'a'), new Mine(pb1, 'b') ]
+
+    move = (state, m) -> 
+
+        # always let the player move first
+        state = moveState state, m.action
+
+        ids = byId state
+        ma = ids.a
+        mb = ids.b
+
+        # now, patrol back and forth. Both of these configurations are solvable. 
+        # each mine chooses it's other location, but not on top of the good guys
+        # don't move onto the guy
+        px = state.player.x
+        py = state.player.y
+
+        # move, but don't hit the player
+        update = (m, p) ->
+            if hit(state.player, p) then return
+            m.x = p.x
+            m.y = p.y
+
+        if hit ma, pa1 then update ma, pa2
+        else update ma, pa1
+
+        if hit mb, pb1 then update mb, pb2
+        else update mb, pb1
+
+        state
+
+    {start, move}
+
+exports.puppyGuard = puppyGuard()
+
+hit = (a, b) -> a.x == b.x && a.y == b.y
+
+# single mine speeds towards you for the kill
+exports.attackDrones = 
+    start: ->
+    move: ->
+
+
+
+pkey = (x, y) -> x + "," + y
+
+# returns a map of stuff by pkey
+byLocation = (state) ->
+    map = {}
+    for m in state.mines
+        map[pkey(m.x, m.y)] = m
+    map[pkey(state.player.x, state.player.y)] = state.player
+    map
+
+# returns a map of mines by id (don't need player, you already have him in state.player)
+byId = (state) ->
+    map = {}
+    for m in state.mines
+        map[m.id] = m
+    map
+
+random = (n) -> Math.floor(Math.random() * n)
 
 # returns a mine function that create a mine with a unique id 
 mines = ->
