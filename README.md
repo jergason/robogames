@@ -18,20 +18,19 @@ POST to /minefield/levels/:level/games
 where :level is a level (see below for a list of levels)
 
 and post body is:
-```javascript
-var user =  { username: "username, //required
-  email: "youremail@email.com" // optional
-	link: "github.com/name/yourcode" //optional
-	}
-```
+    { username: "username, //required
+    email: "youremail@email.com" // optional
+    link: "github.com/name/yourcode" //optional
+    }
+
 encoded as JSON or form-encoded
 
 it returns a JSON object:
-```javascript
-var newGame = { gameId: 'exampleId', // a random Id
-  		state: StateObj // (see state below)
-		}
-```
+
+    { gameId: 'exampleId', // a random Id
+      state: StateObj // (see state below)
+    }
+
 
 ####NOTE: Only one game per level per player at a time, i.e, creating a new game on level 1 will delete your previous attempt
 
@@ -42,9 +41,9 @@ POST to /minefield/:gameId/moves
 where :gameId is the id received from the start post
 
 and post body is (JSON or form encoded):
-```javascript
-var action = { action: "direction" } //valid directions are "up" "down" "left" "right"
-```
+
+    { action: "direction" } //valid directions are "up" "down" "left" "right"
+
 or a 500 error if the move is invalid or the game is now over
 
 it returns the new state of the game (see game state below)
@@ -55,14 +54,13 @@ Game State
 For each gameId, the server keeps track of the current game state and all prior states
 
 On starting a game and on each subsequent move, the new game state is returned which is as below:
-```javascript
-var state = { mode: 'play', // valid modes are "play", "dead", and "won"
-  		size: { w: 2, h: 2 }, // the size of the board
-  		player: { x: 0, y: 0 }, // the players current positon
-  		target: { x: 0, y: 1 }, // the goal you want to get to
-  		mines: [{x: 1, y:0  id: 0}] // an array of mines and their positions
-		}
-```
+
+    { mode: 'play', // valid modes are "play", "dead", and "won"
+    size: { w: 2, h: 2 }, // the size of the board
+    player: { x: 0, y: 0 }, // the players current positon
+    target: { x: 0, y: 1 }, // the goal you want to get to
+    mines: [{x: 1, y:0  id: 0}] // an array of mines and their positions
+    }
 
 Web Frontend
 --------------
@@ -76,6 +74,7 @@ To view a specific game, hit: /#/game/:gameId where :gameId is the id of the gam
 The are also http routes to see the game in text form:
 
 GET /games/:gameId/state.txt returns a text document with the game position, such as:
+<pre>
 	_____________________
 	| | | |x| | | | | | |
 	| | | |o| | | |x| | |
@@ -93,6 +92,7 @@ o - your position
 * - the target
 d - your dead robot
 
+</pre>
 GET /games/:gameId/state/:n.txt returns the nth state of the game
 
 
