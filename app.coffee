@@ -65,7 +65,7 @@ exports.createServer = ->
     app.get "/minefield/levels", (req, res) ->
         res.send minefield.levels()
 
-    # ret: [{gameId, username}] +# of turns taken
+    # ret: [{gameId, username, won:true|false}]
     app.get "/minefield/levels/:level/games", (req, res) ->
         games.byLevel minefield, req.param('level'), (err, games) ->
             if err? then return res.send err, 500
