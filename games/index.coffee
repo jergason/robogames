@@ -32,11 +32,12 @@ exports.fetch = (games, gameId, cb) -> games.findOne({gameId:gameId}, cb)
 # returns the list of entrants
 exports.entrants = (games, withDupes, cb) ->
     query = {
-        "level" : {"$nin" : ["one", "easy"]}
+        "state.mode": "won"
+	    # we exlucde one, two, three because those aren't the right names and easy, because it is given
+        "level" : {"$nin" : ["one", "easy", "two", "three"]}
     }
-    games.find({"state.mode":"won", query}, {_id: 0, "player.username": 1}).toArray (err, docs) ->
+    games.find(query, {_id: 0, "player.username": 1, level: 1}).toArray (err, docs) ->
         if err? then return cb err
-
         
         usernames = []
         userObj = {}

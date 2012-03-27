@@ -119,7 +119,7 @@ exports.createServer = ->
             res.send leaders
 
     app.get "/players/entries.txt", (req, res) ->
-        games.entrants false, (err, users) ->
+        games.entrants true, (err, users) ->
             if err? then return res.send err, 500
             if not users then return res.send "No users", 404
             res.send users.join("\n") + "\n"
