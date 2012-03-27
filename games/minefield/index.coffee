@@ -20,7 +20,7 @@ exports.name = "minefield"
 
 # LEVELS ##################################################################
 
-exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "attackDrone", "puppyGuard", "armyAnts"]
+exports.levels = -> ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "attackDrone", "puppyGuard", "armyAnts"]
 
 # only have to move one space!
 exports.one = exports.tiny = 
@@ -236,6 +236,7 @@ exports.movingTarget =
 
 
 # can you finish in a reasonable number of moves?
+# bah, I'm sick of writing these. Looks good!
 exports.huge = 
     start: ->
     move: ->
@@ -270,7 +271,31 @@ exports.armyAnts =
         state
 
 # same as army ants but they won't move on top of you
-exports.armyAntsSafe = {}
+exports.blackAnts = 
+    start: -> 
+        w = 10
+        h = 10
+        mine = mines()
+        rmine = -> mine(random(w-2)+1, random(h-2)+1)
+        state =
+            mode: modes.play
+            size: size w, h
+            player: point 0, 0
+            target: point 9, 9
+            mines: [0..17].map rmine
+
+    move: (state, m) ->
+
+        # let the player move first
+        state = moveState state, m.action
+
+        # now, move them all randomly
+        state.mines = state.mines.map (m) ->
+            newM = randomMovement(state.size, m)
+            console.log "NEW MINES!", m, newM
+            if hit(newM, state.player) then m else newM
+
+        state 
 
 
 dstop = {x:0, y:0}
@@ -336,11 +361,13 @@ moveState = (currentState, action) ->
     if not withinBounds state.size, state.player
         return false
 
-    if collision state.mines, state.player
+    # if you get there first, you're ok, even if a mine is there
+    if won state.target, state.player
+        state.mode = modes.won
+
+    else if collision state.mines, state.player
         state.mode = modes.dead
 
-    else if won state.target, state.player
-        state.mode = modes.won
 
     state
 

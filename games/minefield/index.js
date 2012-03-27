@@ -23,7 +23,7 @@ Synchronous: all level moves return synchronously.
   exports.name = "minefield";
 
   exports.levels = function() {
-    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "attackDrone", "puppyGuard", "armyAnts"];
+    return ["tiny", "empty", "easy", "randomMines", "muchosMines", "movingTarget", "blackAnts", "attackDrone", "puppyGuard", "armyAnts"];
   };
 
   exports.one = exports.tiny = {
@@ -282,7 +282,38 @@ Synchronous: all level moves return synchronously.
     }
   };
 
-  exports.armyAntsSafe = {};
+  exports.blackAnts = {
+    start: function() {
+      var h, mine, rmine, state, w;
+      w = 10;
+      h = 10;
+      mine = mines();
+      rmine = function() {
+        return mine(random(w - 2) + 1, random(h - 2) + 1);
+      };
+      return state = {
+        mode: modes.play,
+        size: size(w, h),
+        player: point(0, 0),
+        target: point(9, 9),
+        mines: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(rmine)
+      };
+    },
+    move: function(state, m) {
+      state = moveState(state, m.action);
+      state.mines = state.mines.map(function(m) {
+        var newM;
+        newM = randomMovement(state.size, m);
+        console.log("NEW MINES!", m, newM);
+        if (hit(newM, state.player)) {
+          return m;
+        } else {
+          return newM;
+        }
+      });
+      return state;
+    }
+  };
 
   dstop = {
     x: 0,
@@ -379,10 +410,10 @@ Synchronous: all level moves return synchronously.
     state = _.clone(currentState);
     state.player = movePoint(state.player, action);
     if (!withinBounds(state.size, state.player)) return false;
-    if (collision(state.mines, state.player)) {
-      state.mode = modes.dead;
-    } else if (won(state.target, state.player)) {
+    if (won(state.target, state.player)) {
       state.mode = modes.won;
+    } else if (collision(state.mines, state.player)) {
+      state.mode = modes.dead;
     }
     return state;
   };
