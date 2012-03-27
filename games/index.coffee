@@ -14,6 +14,7 @@ class Model
         @move = exports.move.partial collection
         @index = exports.index.partial collection
         @fetch = exports.fetch.partial collection
+        @fetchStateAtTurn = exports.fetchStateAtTurn.partial collection
 
 
 exports.Model = Model
@@ -60,6 +61,10 @@ exports.lastState = (games, gameId, cb) ->
         if not doc? then return cb new Error("Could not find game")
         cb null, Game.convert(doc)
 
+exports.fetchStateAtTurn = (games, gameId, n, cb) ->
+    games.findOne {gameId: gameId}, {_id: 0, states: 1}, (err, doc) ->
+        if err? || !(doc?) then return cb err
+        cb null, doc.states[n]
 
 
 updateState = (games, gameId, state, cb) ->

@@ -19,6 +19,7 @@ The front-end for the different games. Handles storage and retreival of game sta
       this.move = exports.move.partial(collection);
       this.index = exports.index.partial(collection);
       this.fetch = exports.fetch.partial(collection);
+      this.fetchStateAtTurn = exports.fetchStateAtTurn.partial(collection);
     }
 
     return Model;
@@ -69,6 +70,18 @@ The front-end for the different games. Handles storage and retreival of game sta
       if (err != null) return cb(err);
       if (!(doc != null)) return cb(new Error("Could not find game"));
       return cb(null, Game.convert(doc));
+    });
+  };
+
+  exports.fetchStateAtTurn = function(games, gameId, n, cb) {
+    return games.findOne({
+      gameId: gameId
+    }, {
+      _id: 0,
+      states: 1
+    }, function(err, doc) {
+      if ((err != null) || !(doc != null)) return cb(err);
+      return cb(null, doc.states[n]);
     });
   };
 

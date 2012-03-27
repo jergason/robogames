@@ -1,5 +1,5 @@
 (function() {
-  var Games, MONGODB_HOST, PORT, app, connectLess, express, minefield, mongo, notImplemented;
+  var Games, MONGODB_HOST, PORT, app, connectLess, debug, express, minefield, mongo, notImplemented, textualize;
 
   PORT = process.env.PORT || 2663;
 
@@ -12,6 +12,8 @@
   mongo = require('mongodb-wrapper');
 
   Games = require('./games').Model;
+
+  debug = require('./games/debug');
 
   minefield = require('./games/minefield');
 
@@ -62,8 +64,41 @@
         return res.send(game.state);
       });
     });
+    app.get("/games/:gameId/state.txt", function(req, res) {
+      return games.fetch(req.param('gameId'), function(err, game) {
+        if (err != null) return res.send(err, 500);
+        if (!game) return res.send(404);
+        res.contentType(".txt");
+        return res.send(textualize(game.state));
+      });
+    });
+    app.get("/games/:gameId/state/:n.txt", function(req, res) {
+      var gameId, n;
+      gameId = req.param('gameId');
+      n = parseInt(req.param('n'), 10);
+      return games.fetchStateAtTurn(gameId, n, function(err, state) {
+        if (err != null) return res.send(err, 500);
+        if (!state) return res.send(404);
+        res.contentType(".txt");
+        return res.send(textualize(state));
+      });
+    });
+    app.get("/games/:gameId/state/:n", function(req, res) {
+      var gameId, n;
+      gameId = req.param('gameId');
+      n = parseInt(req.param('n'), 10);
+      return games.fetchStateAtTurn(gameId, n, function(err, state) {
+        if (err != null) return res.send(err, 500);
+        if (!state) return res.send(404);
+        return res.send(state);
+      });
+    });
     app.get("/players/:username/games", notImplemented);
     return app;
+  };
+
+  textualize = function(s) {
+    return debug.dump(debug.toRows(s));
   };
 
   notImplemented = function(req, res) {

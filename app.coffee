@@ -10,6 +10,7 @@ mongo = require 'mongodb-wrapper'
 
 # games
 Games = require('./games').Model
+debug = require './games/debug'
 minefield = require './games/minefield'
 
 exports.createServer = ->
@@ -93,12 +94,43 @@ exports.createServer = ->
             if !game then return res.send 404
             res.send game.state
 
+    # returns text visualization of state for a game
+    app.get "/games/:gameId/state.txt", (req, res) ->
+        games.fetch req.param('gameId'), (err, game) ->
+            if err? then return res.send err, 500
+            if !game then return res.send 404
+            res.contentType ".txt"
+            res.send textualize game.state
+
+    app.get "/games/:gameId/state/:n.txt", (req, res) ->
+        gameId = req.param('gameId')
+        n = parseInt(req.param('n'), 10)
+        games.fetchStateAtTurn gameId, n, (err, state) ->
+            if err? then return res.send err, 500
+            if !state then return res.send 404
+            res.contentType ".txt"
+            res.send textualize state
+
+    app.get "/games/:gameId/state/:n", (req, res) ->
+        gameId = req.param('gameId')
+        n = parseInt(req.param('n'), 10)
+        games.fetchStateAtTurn gameId, n, (err, state) ->
+            if err? then return res.send err, 500
+            if !state then return res.send 404
+            res.send state
+
+
+
+
+
     # ret: ["gameId"]
     app.get "/players/:username/games", notImplemented
 
 
     app
 
+
+textualize = (s) -> debug.dump(debug.toRows(s))
 
 notImplemented = (req, res) ->
     res.send "Not Implemented", 501
