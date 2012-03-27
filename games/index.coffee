@@ -34,7 +34,7 @@ exports.entrants = (games, withDupes, cb) ->
     query = {
         "state.mode": "won"
 	    # we exlucde one, two, three because those aren't the right names and easy, because it is given
-        "level" : {"$nin" : ["one", "easy", "two", "three"]}
+        "level" : {"$nin" : ["one", "tiny", "two", "three"]}
     }
     games.find(query, {_id: 0, "player.username": 1, level: 1}).toArray (err, docs) ->
         if err? then return cb err
