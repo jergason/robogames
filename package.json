@@ -8,7 +8,7 @@
         "url": "git://github.com/idottv/robogames.git"
     },
     "scripts": {
-        "test": "node_modules/.bin/coffee -c . && node_modules/.bin/mocha test/*.spec.js"
+        "test": "bin/test"
     },
     "engines": {
         "node": "0.6.x"
@@ -19,7 +19,9 @@
         "async": "0.1.15",
         "underscore": "1.1.5",
         "coffee-script":"1.2.0",
-        "fjs": "0.1.0"
+        "fjs": "0.1.0",
+        "connect-less": "0.2.4",
+        "mongodb-wrapper":"0.2.7"
     },
 
     "devDependencies": {

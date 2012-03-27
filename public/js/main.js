@@ -1,0 +1,88 @@
+// set up some paths for require
+require.config({
+    baseUrl: "/",
+    paths: {
+        backbone: "js/lib/backbone",
+        text: "js/lib/requirejs/text",
+        order: "js/lib/requirejs/order",
+        jquery: "js/lib/jquery.custom",
+        underscore: "js/lib/underscore.custom",
+        datejs: "js/lib/date",
+        moment: "js/lib/moment.min",
+        modernizr: "js/lib/modernizr",
+        color: "js/lib/color",
+        SimpleHtmlParser: "js/lib/mold/simplehtmlparser",
+        mold: "js/lib/mold/mold"
+    }
+})
+
+require(["jquery", "modernizr", "backbone", "views/GameBoard"],
+    function ($, modernizr, Backbone, GameBoard) {
+        var game = new GameBoard({
+            width: 40,
+            height: 30,
+            turns: [
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 2},
+                        {id: "c", x: 3, y: 2},
+                        {id: "d", x: 4, y: 2},
+                        {id: "e", x: 5, y: 2},
+                    ]
+                },
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 3},
+                        {id: "c", x: 3, y: 2},
+                        {id: "d", x: 4, y: 2},
+                        {id: "e", x: 5, y: 2},
+                    ]
+                },
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 2},
+                        {id: "c", x: 3, y: 3},
+                        {id: "d", x: 4, y: 2},
+                        {id: "e", x: 5, y: 2},
+                    ]
+                },
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 3},
+                        {id: "c", x: 3, y: 3},
+                        {id: "d", x: 4, y: 3},
+                        {id: "e", x: 5, y: 2},
+                    ]
+                },
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 3},
+                        {id: "c", x: 3, y: 3},
+                        {id: "d", x: 4, y: 3},
+                        {id: "e", x: 5, y: 3},
+                    ]
+                },
+                {
+                    mines: [
+                        {id: "a", x: 1, y: 3},
+                        {id: "b", x: 2, y: 3},
+                        {id: "c", x: 3, y: 3},
+                        {id: "d", x: 4, y: 3},
+                        {id: "e", x: 5, y: 4},
+                    ]
+                },
+            ]
+        })
+
+        $("#mainContent").append(game.$el)
+
+        game.resize()
+        game.play()
+
+    }
+)
