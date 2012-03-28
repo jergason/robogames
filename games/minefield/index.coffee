@@ -362,6 +362,8 @@ won = (target, p) ->
 moveState = (currentState, action) ->
 
     state = _.clone currentState
+    if state.mode == modes.dead
+      return false
 
     # make the move
     state.player = movePoint state.player, action
